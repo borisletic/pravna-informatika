@@ -27,52 +27,61 @@ public class CaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Da li je slučaj nastao iz izvorne odluke ili od korisnika.
-     */
     @Enumerated(EnumType.STRING)
+    @Column(name = "source")
     private Source source;
 
-    /**
-     * Ako source = JUDGMENT, ovo je referenca na originalnu odluku.
-     */
+    @Column(name = "source_judgment_id")
     private String sourceJudgmentId;
 
-    // ====== Ključne činjenice (cbr_key: true u predicate_dictionary) ======
+    // ====== Ključne činjenice ======
+    @Column(name = "substance_quantity_m3")
     private Double substanceQuantityM3;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "substance_type")
     private SubstanceType substanceType;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "pollution_target")
     private PollutionTarget pollutionTarget;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "damage_extent")
     private DamageExtent damageExtent;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "intent")
     private Intent intent;
 
+    @Column(name = "prior_conviction")
     private Boolean priorConviction;
+
+    @Column(name = "remedied_damage")
     private Boolean remediedDamage;
 
+    @Column(name = "forest_area_ha")
     private Double forestAreaHa;
 
     // ====== Ishod ======
-    private String articleViolated;   // npr. "art_260__para_1"
+    @Column(name = "article_violated")
+    private String articleViolated;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "sentence_type")
     private SentenceType sentenceType;
 
+    @Column(name = "sentence_months")
     private Integer sentenceMonths;
 
     // ====== Tehnički metapodaci ======
-    @Column(columnDefinition = "TEXT")
-    private String factsJson;   // ostatak činjenica koje nisu u kolonama
+    @Column(name = "facts_json", columnDefinition = "TEXT")
+    private String factsJson;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @PrePersist

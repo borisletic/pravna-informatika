@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Krivični zakonik Republike Srbije
+  Glava XXIV - Krivična dela protiv životne sredine
+  Članovi 260-268
+
+  VLASNIK: Član 1 (Legal Modeling)
+  CELINA: 1
+
+  Anotacija obuhvata:
+    - Klasifikacione jedinice: chapter, article, paragraph
+    - Interne reference: <ref href="#art_XXX"/>
+    - Eksterne reference: <ref href="/akn/rs/act/...">
+    - Datume, organizacije (gde se pojavljuju)
+
+  eId konvencija prema Akoma Ntoso Naming Convention v1.0:
+    art_260                         (član 260)
+    art_260__para_1                 (član 260, stav 1)
+    art_260__para_1__list_1__point_a (stav 1, alineja a)
+
+  Source: Krivični zakonik RS, "Sl. glasnik RS", br. 85/2005,
+          88/2005 - ispr., 107/2005 - ispr., 72/2009, 111/2009,
+          121/2012, 104/2013, 108/2014, 94/2016, 35/2019.
+-->
+<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+  <act name="krivicniZakonik" contains="originalVersion">
+
+    <!-- ============================================================ -->
+    <!-- METAPODACI - FRBR struktura                                  -->
+    <!-- ============================================================ -->
+    <meta>
+      <identification source="#tim">
+
+        <FRBRWork>
+          <FRBRthis value="/akn/rs/act/2005/kz/!main"/>
+          <FRBRuri value="/akn/rs/act/2005/kz"/>
+          <FRBRalias name="caseName" value="Krivični zakonik"/>
+          <FRBRdate date="2005-09-29" name="adoption"/>
+          <FRBRauthor href="#narodna-skupstina-rs"/>
+          <FRBRcountry value="rs"/>
+          <FRBRsubtype value="zakonik"/>
+          <FRBRnumber value="85"/>
+        </FRBRWork>
+
+        <FRBRExpression>
+          <FRBRthis value="/akn/rs/act/2005/kz/srp@2019-05-22/!main"/>
+          <FRBRuri value="/akn/rs/act/2005/kz/srp@2019-05-22"/>
+          <FRBRdate date="2019-05-22" name="lastAmendment"/>
+          <FRBRauthor href="#narodna-skupstina-rs"/>
+          <FRBRlanguage language="srp"/>
+        </FRBRExpression>
+
+        <FRBRManifestation>
+          <FRBRthis value="/akn/rs/act/2005/kz/srp@2019-05-22/!main.xml"/>
+          <FRBRuri value="/akn/rs/act/2005/kz/srp@2019-05-22.xml"/>
+          <FRBRdate date="2025-10-01" name="annotation"/>
+          <FRBRauthor href="#tim"/>
+          <FRBRformat value="application/xml"/>
+        </FRBRManifestation>
+
+      </identification>
+
+      <publication number="85"
+                   name="Službeni glasnik Republike Srbije"
+                   showAs="Sl. glasnik RS, br. 85/2005"
+                   date="2005-10-06"/>
+
+      <references source="#tim">
+        <TLCOrganization eId="narodna-skupstina-rs"
+                         href="/ontology/organization/rs/narodna-skupstina"
+                         showAs="Narodna skupština Republike Srbije"/>
+        <TLCOrganization eId="ministarstvo-zivotne-sredine"
+                         href="/ontology/organization/rs/ministarstvo-zastite-zivotne-sredine"
+                         showAs="Ministarstvo nadležno za poslove zaštite životne sredine"/>
+        <TLCPerson eId="tim"
+                   href="/ontology/person/rs/tim-pi-2025"
+                   showAs="Tim Pravna informatika 2025/2026"/>
+      </references>
+    </meta>
+
+    <!-- ============================================================ -->
+    <!-- BODY                                                          -->
+    <!-- ============================================================ -->
+    <body>
+      <chapter eId="chp_XXIV">
+        <num>Glava dvadeset četvrta</num>
+        <heading>Krivična dela protiv životne sredine</heading>
+
+        <!-- ============================================================ -->
+        <!-- ČLAN 260: Zagađenje životne sredine                          -->
+        <!-- ============================================================ -->
+        <article eId="art_260">
+          <num>Član 260</num>
+          <heading>Zagađenje životne sredine</heading>
+
+          <paragraph eId="art_260__para_1">
+            <num>(1)</num>
+            <content>
+              <p>Ko kršeći propise o zaštiti, očuvanju i unapređenju životne sredine
+              zagadi vazduh, vodu ili zemljište u većoj meri ili na širem prostoru,
+              kazniće se zatvorom od šest meseci do pet godina i novčanom kaznom.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_260__para_2">
+            <num>(2)</num>
+            <content>
+              <p>Ako je delo iz <ref href="#art_260__para_1">stava 1. ovog člana</ref>
+              učinjeno iz nehata, učinilac će se kazniti novčanom kaznom ili zatvorom
+              do dve godine.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_260__para_3">
+            <num>(3)</num>
+            <content>
+              <p>Ako je usled dela iz <ref href="#art_260__para_1">stava 1. ovog člana</ref>
+              došlo do uništenja ili oštećenja životinjskog ili biljnog sveta velikih
+              razmera ili do zagađenja životne sredine u toj meri da su za njegovo
+              otklanjanje potrebni duže vreme ili veliki troškovi, učinilac će se kazniti
+              zatvorom od jedne do osam godina i novčanom kaznom.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_260__para_4">
+            <num>(4)</num>
+            <content>
+              <p>Ako je usled dela iz <ref href="#art_260__para_2">stava 2. ovog člana</ref>
+              došlo do uništenja ili oštećenja životinjskog ili biljnog sveta velikih
+              razmera ili do zagađenja životne sredine u toj meri da su za njegovo
+              otklanjanje potrebni duže vreme ili veliki troškovi, učinilac će se kazniti
+              zatvorom od šest meseci do pet godina i novčanom kaznom.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_260__para_5">
+            <num>(5)</num>
+            <content>
+              <p>Ako izrekne uslovnu osudu za dela iz
+              <ref href="#art_260__para_1">st. 1.</ref> i
+              <ref href="#art_260__para_4">4. ovog člana</ref>, sud može odrediti
+              obavezu učiniocu da u određenom roku preduzme određene propisane mere
+              zaštite, očuvanja i unapređenja životne sredine.</p>
+            </content>
+          </paragraph>
+        </article>
+
+        <!-- ============================================================ -->
+        <!-- ČLAN 261: Nepreduzimanje mera zaštite životne sredine        -->
+        <!-- ============================================================ -->
+        <article eId="art_261">
+          <num>Član 261</num>
+          <heading>Nepreduzimanje mera zaštite životne sredine</heading>
+
+          <paragraph eId="art_261__para_1">
+            <num>(1)</num>
+            <content>
+              <p>Službeno ili odgovorno lice koje ne preduzme propisane mere zaštite
+              životne sredine, ili ne postupi po odluci nadležnog organa o preduzimanju
+              mera zaštite životne sredine, kazniće se novčanom kaznom ili zatvorom
+              do tri godine.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_261__para_2">
+            <num>(2)</num>
+            <content>
+              <p>Ako je delo iz <ref href="#art_261__para_1">stava 1. ovog člana</ref>
+              učinjeno iz nehata, učinilac će se kazniti novčanom kaznom ili zatvorom
+              do jedne godine.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_261__para_3">
+            <num>(3)</num>
+            <content>
+              <p>Ako je usled dela iz
+              <ref href="#art_261__para_1">st. 1.</ref> i
+              <ref href="#art_261__para_2">2. ovog člana</ref> došlo do zagađenja
+              životne sredine, učinilac će se kazniti za krivično delo iz
+              <ref href="#art_260">člana 260. ovog zakonika</ref>.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_261__para_4">
+            <num>(4)</num>
+            <content>
+              <p>Ako izrekne uslovnu osudu za dela iz
+              <ref href="#art_261__para_1">st. 1.</ref> i
+              <ref href="#art_261__para_2">2. ovog člana</ref>, sud može naložiti
+              obavezu učiniocu da u određenom roku preduzme određene propisane mere
+              zaštite, očuvanja i unapređenja životne sredine.</p>
+            </content>
+          </paragraph>
+        </article>
+
+        <!-- ============================================================ -->
+        <!-- ČLAN 262: Protivpravna izgradnja i stavljanje u pogon...     -->
+        <!-- ============================================================ -->
+        <article eId="art_262">
+          <num>Član 262</num>
+          <heading>Protivpravna izgradnja i stavljanje u pogon objekata i postrojenja koja zagađuju životnu sredinu</heading>
+
+          <paragraph eId="art_262__para_1">
+            <num>(1)</num>
+            <content>
+              <p>Službeno ili odgovorno lice koje protivno propisima o zaštiti,
+              očuvanju i unapređenju životne sredine dozvoli izgradnju, stavljanje
+              u pogon ili upotrebu objekata ili postrojenja ili primenu tehnologije
+              kojima se u većoj meri ili na širem prostoru zagađuje životna sredina,
+              kazniće se zatvorom od šest meseci do pet godina.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_262__para_2">
+            <num>(2)</num>
+            <content>
+              <p>Ako je usled dela iz <ref href="#art_262__para_1">stava 1. ovog člana</ref>
+              došlo do uništenja životinjskog ili biljnog sveta velikih razmera ili do
+              zagađenja životne sredine u toj meri da su za njegovo otklanjanje
+              potrebni duže vreme ili veliki troškovi, učinilac će se kazniti zatvorom
+              od jedne do osam godina.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_262__para_3">
+            <num>(3)</num>
+            <content>
+              <p>Ako izrekne uslovnu osudu za dela iz
+              <ref href="#art_262__para_1">st. 1.</ref> i
+              <ref href="#art_262__para_2">2. ovog člana</ref>, sud može odrediti
+              obavezu učiniocu da u određenom roku preduzme određene propisane mere
+              zaštite, očuvanja i unapređenja životne sredine.</p>
+            </content>
+          </paragraph>
+        </article>
+
+        <!-- ============================================================ -->
+        <!-- ČLAN 263: Oštećenje objekata i uređaja za zaštitu životne sredine -->
+        <!-- ============================================================ -->
+        <article eId="art_263">
+          <num>Član 263</num>
+          <heading>Oštećenje objekata i uređaja za zaštitu životne sredine</heading>
+
+          <paragraph eId="art_263__para_1">
+            <num>(1)</num>
+            <content>
+              <p>Ko ošteti, uništi, ukloni ili na drugi način učini neupotrebljivim
+              objekte ili uređaje za zaštitu životne sredine, kazniće se zatvorom
+              do tri godine.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_263__para_2">
+            <num>(2)</num>
+            <content>
+              <p>Ako je delo iz <ref href="#art_263__para_1">stava 1. ovog člana</ref>
+              učinjeno iz nehata, učinilac će se kazniti novčanom kaznom ili zatvorom
+              do jedne godine.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_263__para_3">
+            <num>(3)</num>
+            <content>
+              <p>Ako je usled dela iz <ref href="#art_263__para_1">stava 1. ovog člana</ref>
+              došlo do zagađenja vazduha, vode ili zemljišta u većoj meri ili na širem
+              prostoru, učinilac će se kazniti zatvorom od šest meseci do pet godina.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_263__para_4">
+            <num>(4)</num>
+            <content>
+              <p>Ako je usled dela iz <ref href="#art_263__para_2">stava 2. ovog člana</ref>
+              došlo do zagađenja vazduha, vode ili zemljišta u većoj meri ili na širem
+              prostoru, učinilac će se kazniti zatvorom do tri godine.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_263__para_5">
+            <num>(5)</num>
+            <content>
+              <p>Ako je usled dela iz
+              <ref href="#art_263__para_1">st. 1.</ref> i
+              <ref href="#art_263__para_3">3. ovog člana</ref> došlo do uništenja ili
+              oštećenja životinjskog ili biljnog sveta velikih razmera ili do zagađenja
+              životne sredine u toj meri da su za njegovo otklanjanje potrebni duže vreme
+              ili veliki troškovi, učinilac će se kazniti zatvorom od jedne do osam godina.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_263__para_6">
+            <num>(6)</num>
+            <content>
+              <p>Ako je usled dela iz
+              <ref href="#art_263__para_2">st. 2.</ref> i
+              <ref href="#art_263__para_4">4. ovog člana</ref> došlo do uništenja ili
+              oštećenja životinjskog ili biljnog sveta velikih razmera ili do zagađenja
+              životne sredine u toj meri da su za njegovo otklanjanje potrebni duže vreme
+              ili veliki troškovi, učinilac će se kazniti zatvorom od šest meseci do pet godina.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_263__para_7">
+            <num>(7)</num>
+            <content>
+              <p>Ako izrekne uslovnu osudu za dela iz
+              <ref href="#art_263__para_1">st. 1. do</ref>
+              <ref href="#art_263__para_6">6. ovog člana</ref>, sud može odrediti
+              obavezu učiniocu da u određenom roku preduzme određene propisane mere
+              zaštite, očuvanja i unapređenja životne sredine.</p>
+            </content>
+          </paragraph>
+        </article>
+
+        <!-- ============================================================ -->
+        <!-- ČLAN 264: Oštećenje životne sredine                          -->
+        <!-- ============================================================ -->
+        <article eId="art_264">
+          <num>Član 264</num>
+          <heading>Oštećenje životne sredine</heading>
+
+          <paragraph eId="art_264__para_1">
+            <num>(1)</num>
+            <content>
+              <p>Ko kršeći propise, iskorišćavanjem prirodnih bogatstava, izgradnjom
+              objekata, izvođenjem kakvih radova ili na drugi način izazove oštećenje
+              životne sredine u većoj meri ili na širem prostoru, kazniće se zatvorom
+              do tri godine.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_264__para_2">
+            <num>(2)</num>
+            <content>
+              <p>Ako je delo iz <ref href="#art_264__para_1">stava 1. ovog člana</ref>
+              učinjeno iz nehata, učinilac će se kazniti novčanom kaznom ili zatvorom
+              do jedne godine.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_264__para_3">
+            <num>(3)</num>
+            <content>
+              <p>Ako izrekne uslovnu osudu za dela iz
+              <ref href="#art_264__para_1">st. 1.</ref> i
+              <ref href="#art_264__para_2">2. ovog člana</ref>, sud može odrediti
+              obavezu učiniocu da u određenom roku preduzme određene mere u cilju
+              otklanjanja štetnih posledica po životnu sredinu.</p>
+            </content>
+          </paragraph>
+        </article>
+
+        <!-- ============================================================ -->
+        <!-- ČLAN 265: Uništenje, oštećenje, iznošenje u inostranstvo...  -->
+        <!-- ============================================================ -->
+        <article eId="art_265">
+          <num>Član 265</num>
+          <heading>Uništenje, oštećenje, iznošenje u inostranstvo i unošenje u Srbiju zaštićenog prirodnog dobra</heading>
+
+          <paragraph eId="art_265__para_1">
+            <num>(1)</num>
+            <content>
+              <p>Ko uništi ili ošteti posebno zaštićeno prirodno dobro, kazniće se
+              zatvorom od šest meseci do pet godina.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_265__para_2">
+            <num>(2)</num>
+            <content>
+              <p>Ako je delo iz <ref href="#art_265__para_1">stava 1. ovog člana</ref>
+              učinjeno iz nehata, učinilac će se kazniti novčanom kaznom ili zatvorom
+              do šest meseci.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_265__para_3">
+            <num>(3)</num>
+            <content>
+              <p>Ko protivno propisima izveze ili iznese u inostranstvo strogo zaštićenu,
+              odnosno zaštićenu vrstu biljaka ili životinja ili uveze ili unese u Srbiju
+              stranu vrstu biljaka ili životinja zaštićenu međunarodnim ugovorima i
+              dokumentima, kazniće se zatvorom od tri meseca do tri godine i novčanom kaznom.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_265__para_4">
+            <num>(4)</num>
+            <content>
+              <p>Za pokušaj dela iz <ref href="#art_265__para_3">stava 3. ovog člana</ref>
+              će se kazniti.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_265__para_5">
+            <num>(5)</num>
+            <content>
+              <p>Strogo zaštićena ili zaštićena vrsta biljaka ili životinja iz
+              <ref href="#art_265__para_3">stava 3. ovog člana</ref> oduzeće se.</p>
+            </content>
+          </paragraph>
+        </article>
+
+        <!-- ============================================================ -->
+        <!-- ČLAN 266: Unošenje opasnih materija u Srbiju...              -->
+        <!-- ============================================================ -->
+        <article eId="art_266">
+          <num>Član 266</num>
+          <heading>Unošenje opasnih materija u Srbiju i nedozvoljeno prerađivanje, odlaganje i skladištenje opasnih materija</heading>
+
+          <paragraph eId="art_266__para_1">
+            <num>(1)</num>
+            <content>
+              <p>Ko protivno propisima unese u Srbiju radioaktivne ili druge opasne
+              materije ili opasne otpatke, ili ko prevozi, prerađuje, odlaže, sakuplja
+              ili skladišti takve materije ili otpatke, kazniće se zatvorom od šest
+              meseci do pet godina i novčanom kaznom.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_266__para_2">
+            <num>(2)</num>
+            <content>
+              <p>Ko zloupotrebom svog službenog položaja ili ovlašćenja dozvoli ili
+              omogući da se u Srbiju unesu materije ili otpatci iz
+              <ref href="#art_266__para_1">stava 1. ovog člana</ref>, ili omogući da
+              se takve materije ili otpatci prevoze, prerađuju, odlažu, sakupljaju ili
+              skladište, kazniće se zatvorom od jedne do osam godina i novčanom kaznom.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_266__para_3">
+            <num>(3)</num>
+            <content>
+              <p>Ako je usled dela iz
+              <ref href="#art_266__para_1">st. 1.</ref> i
+              <ref href="#art_266__para_2">2. ovog člana</ref> došlo do uništenja
+              životinjskog ili biljnog sveta velikih razmera ili do zagađenja životne
+              sredine u toj meri da su za njegovo otklanjanje potrebni duže vreme ili
+              veliki troškovi, učinilac će se kazniti zatvorom od dve do deset godina
+              i novčanom kaznom.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_266__para_4">
+            <num>(4)</num>
+            <content>
+              <p>Ako izrekne uslovnu osudu za dela iz
+              <ref href="#art_266__para_1">st. 1. do</ref>
+              <ref href="#art_266__para_3">3. ovog člana</ref>, sud može odrediti
+              obavezu učiniocu da u određenom roku preduzme određene propisane mere
+              zaštite od jonizujućih zračenja ili druge propisane mere zaštite.</p>
+            </content>
+          </paragraph>
+
+          <paragraph eId="art_266__para_5">
+            <num>(5)</num>
+            <content>
+              <p>Ko organizuje vršenje dela iz
+              <ref href="#art_266__para_1">stava 1. ovog člana</ref>, kazniće se
+              zatvorom od tri do deset godina i novčanom kaznom.</p>
+            </content>
+          </paragraph>
+        </article>
+
+        <!-- ============================================================ -->
+        <!-- ČLAN 267: Nedozvoljena izgradnja nuklearnih postrojenja      -->
+        <!-- ============================================================ -->
+        <article eId="art_267">
+          <num>Član 267</num>
+          <heading>Nedozvoljena izgradnja nuklearnih postrojenja</heading>
+
+          <paragraph eId="art_267__para_1">
+            <num/>
+            <content>
+              <p>Ko protivno propisima odobri ili pristupi izgradnji nuklearne elektrane,
+              postrojenja za proizvodnju nuklearnog goriva ili postrojenja za preradu
+              isluženog nuklearnog otpada, kazniće se zatvorom od šest meseci do pet
+              godina.</p>
+            </content>
+          </paragraph>
+        </article>
+
+        <!-- ============================================================ -->
+        <!-- ČLAN 268: Povreda prava na informisanje o stanju životne sredine -->
+        <!-- ============================================================ -->
+        <article eId="art_268">
+          <num>Član 268</num>
+          <heading>Povreda prava na informisanje o stanju životne sredine</heading>
+
+          <paragraph eId="art_268__para_1">
+            <num/>
+            <content>
+              <p>Ko protivno propisima uskrati podatke ili da neistinite podatke o
+              stanju životne sredine i pojavama koji su neophodni za procenu opasnosti
+              po životnu sredinu i preduzimanje mera zaštite života i zdravlja ljudi,
+              kazniće se novčanom kaznom ili zatvorom do jedne godine.</p>
+            </content>
+          </paragraph>
+        </article>
+
+      </chapter>
+    </body>
+  </act>
+</akomaNtoso>
