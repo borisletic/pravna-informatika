@@ -1,38 +1,198 @@
 # Rečnik činjenica — UGOVOR između Člana 1 (pravila) i Člana 2 (NLP, CBR)
 #
-# Ovo je polazni skup. Dodavanje novih predikata = poruka u grupi + bump verzije.
-# Brisanje predikata = NIKAD bez dogovora (lome se i pravila i NLP).
+# Verzija: 0.2.0
+# Poslednja izmena: posle analize KZ čl. 260-268
 #
-# Verzija: 0.1.0
-# Poslednja izmena: SETUP
+# CHANGE LOG od 0.1.0:
+#   - Dodato: pollutionExtent (manja/veća mera) - kritično za R1
+#   - Dodato: pollutionScope (uži/širi prostor)
+#   - Dodato: ecologicalDamage (uništenje velikih razmera) - za kvalifikovane oblike
+#   - Dodato: damageRemovalDifficulty (duže vreme/veliki troškovi)
+#   - Dodato: perpetratorType (običan učinilac / službeno lice)
+#   - Dodato: substanceDanger (radioaktivna/opasna)
+#   - Dodato: dangerousSubstanceAction (unos/prevoz/prerada/odlaganje/skladištenje)
+#   - Dodato: officialPositionAbuse (zloupotreba službenog položaja)
+#   - Dodato: organizesCrime (organizuje vršenje dela)
+#   - Promenjeno: substanceQuantityM3 je sad samo informativni, ne ulazi u pravila
+#     (jer KZ ne navodi konkretne količine - to je za CBR)
+#   - Dodato: enum SubstanceTarget razdvojen od pollutionTarget
 
-version: "0.1.0"
+version: "0.2.0"
 
 predicates:
 
-  # ===== KVANTITATIVNE ČINJENICE =====
+  # ============================================================
+  # OSNOVNI KVALIFIKATORI ZAGADJENJA (čl. 260)
+  # ============================================================
+
+  pollutionExtent:
+    type: enum
+    values: [MANJA_MERA, VECA_MERA]
+    description: "Da li je zagadjenje 'u većoj meri' kako KZ kvalifikuje"
+    used_in_rules: [R1, R2]
+    cbr_key: true
+    cbr_weight: 0.15
+    similarity:
+      type: ordinal
+      order: [MANJA_MERA, VECA_MERA]
+
+  pollutionScope:
+    type: enum
+    values: [UZI_PROSTOR, SIRI_PROSTOR]
+    description: "Da li je zagadjenje 'na širem prostoru' kako KZ kvalifikuje"
+    used_in_rules: [R1, R2]
+    cbr_key: true
+    cbr_weight: 0.10
+    similarity:
+      type: ordinal
+      order: [UZI_PROSTOR, SIRI_PROSTOR]
+
+  pollutionTarget:
+    type: enum
+    values: [VAZDUH, VODA, ZEMLJISTE, VISESTRUKO]
+    description: "Šta je zagadjeno (vazduh/voda/zemljište iz čl. 260 st. 1)"
+    used_in_rules: [R1]
+    cbr_key: true
+    cbr_weight: 0.10
+
+  violatedEnvironmentalRegs:
+    type: boolean
+    description: "Da li je učinilac kršio propise o zaštiti životne sredine"
+    used_in_rules: [R1]
+    cbr_key: false
+
+  intent:
+    type: enum
+    values: [UMISLJAJ, NEHAT]
+    description: "Oblik krivice (čl. 260 st. 1 - umišljaj, st. 2 - nehat)"
+    used_in_rules: [R1, R2, R3, R4]
+    cbr_key: true
+    cbr_weight: 0.15
+
+  # ============================================================
+  # KVALIFIKOVANI OBLICI - posledice (čl. 260 st. 3, 4)
+  # ============================================================
+
+  ecologicalDamage:
+    type: enum
+    values: [NEMA, OBICNA, VELIKIH_RAZMERA]
+    description: "Uništenje/oštećenje životinjskog ili biljnog sveta"
+    used_in_rules: [R3, R4]
+    cbr_key: true
+    cbr_weight: 0.15
+    similarity:
+      type: ordinal
+      order: [NEMA, OBICNA, VELIKIH_RAZMERA]
+
+  damageRemovalDifficulty:
+    type: enum
+    values: [JEDNOSTAVNO, ZAHTEVNO]
+    description: "Da li su za otklanjanje potrebni 'duže vreme ili veliki troškovi'"
+    used_in_rules: [R3, R4]
+    cbr_key: true
+    cbr_weight: 0.10
+
+  # ============================================================
+  # SUBJEKT KRIVIČNOG DELA (čl. 261, 262 - službeno lice)
+  # ============================================================
+
+  perpetratorType:
+    type: enum
+    values: [OBICAN, SLUZBENO_LICE, ODGOVORNO_LICE]
+    description: "Tip učinioca - obični ili službeno/odgovorno lice"
+    used_in_rules: [R5, R6, R7]
+    cbr_key: true
+    cbr_weight: 0.10
+
+  failedToTakeProtectiveMeasures:
+    type: boolean
+    description: "Službeno/odgovorno lice nije preduzelo propisane mere zaštite (čl. 261)"
+    used_in_rules: [R5]
+    cbr_key: false
+
+  unauthorizedConstruction:
+    type: boolean
+    description: "Dozvolio izgradnju/upotrebu objekata koji zagadjuju (čl. 262)"
+    used_in_rules: [R6]
+    cbr_key: false
+
+  # ============================================================
+  # OŠTEĆENJE OBJEKATA ZAŠTITE (čl. 263)
+  # ============================================================
+
+  damagedProtectionEquipment:
+    type: boolean
+    description: "Oštetio/uništio objekte ili uređaje za zaštitu životne sredine"
+    used_in_rules: [R7]
+    cbr_key: false
+
+  # ============================================================
+  # ZAŠTIĆENA PRIRODNA DOBRA I VRSTE (čl. 265)
+  # ============================================================
+
+  destroyedProtectedNaturalAsset:
+    type: boolean
+    description: "Uništio/oštetio posebno zaštićeno prirodno dobro (čl. 265 st. 1)"
+    used_in_rules: [R8]
+    cbr_key: false
+
+  illegalSpeciesTraffic:
+    type: boolean
+    description: "Protivpravno iznošenje/unošenje zaštićene vrste (čl. 265 st. 3)"
+    used_in_rules: [R9]
+    cbr_key: false
+
+  # ============================================================
+  # OPASNE MATERIJE (čl. 266)
+  # ============================================================
+
+  dangerousSubstanceAction:
+    type: boolean
+    description: "Unos/prevoz/prerada/odlaganje/sakupljanje/skladištenje opasnih materija"
+    used_in_rules: [R10, R11]
+    cbr_key: false
+
+  officialPositionAbuse:
+    type: boolean
+    description: "Zloupotreba službenog položaja (čl. 266 st. 2)"
+    used_in_rules: [R11]
+    cbr_key: false
+
+  organizesCrime:
+    type: boolean
+    description: "Organizuje vršenje dela (čl. 266 st. 5)"
+    used_in_rules: [R12]
+    cbr_key: false
+
+  # ============================================================
+  # NUKLEARNA POSTROJENJA I INFORMISANJE (čl. 267, 268)
+  # ============================================================
+
+  unauthorizedNuclearFacility:
+    type: boolean
+    description: "Odobrio/pristupio izgradnji nuklearnog postrojenja bez propisa (čl. 267)"
+    used_in_rules: [R13]
+    cbr_key: false
+
+  deniedEnvironmentalInfo:
+    type: boolean
+    description: "Uskratio/dao neistinite podatke o stanju životne sredine (čl. 268)"
+    used_in_rules: [R14]
+    cbr_key: false
+
+  # ============================================================
+  # DODATNE INFORMATIVNE ČINJENICE (za CBR i NLP)
+  # ============================================================
 
   substanceQuantityM3:
     type: number
     unit: "m^3"
-    description: "Količina ispuštene supstance u kubnim metrima"
+    description: "Količina ispuštene supstance (informativno, ne ulazi u pravila jer KZ ne specifira pragove)"
     nlp_patterns:
-      - '\d+(?:[.,]\d+)?\s*(?:m³|m3|кубних метара|kubnih metara)'
-    used_in_rules: [R1, R3]
-    cbr_key: true
-    cbr_weight: 0.20
-
-  forestAreaHa:
-    type: number
-    unit: "ha"
-    description: "Površina uništene/oštećene šume u hektarima"
-    nlp_patterns:
-      - '\d+(?:[.,]\d+)?\s*(?:ha|хектара|hektara)'
-    used_in_rules: [R6]
+      - '\d+(?:[.,]\d+)?\s*(?:m³|m3|kubnih metara|кубних метара)'
+    used_in_rules: []
     cbr_key: true
     cbr_weight: 0.10
-
-  # ===== KATEGORIJALNE ČINJENICE =====
 
   substanceType:
     type: enum
@@ -42,94 +202,48 @@ predicates:
       - KOMUNALNI_OTPAD
       - NAFTNI_DERIVATI
       - OSTALO
-    description: "Tip ispuštene/odlozenо supstance"
-    used_in_rules: [R1, R2]
+    description: "Tip ispuštene supstance (informativno + za CBR sličnost)"
+    used_in_rules: []
     cbr_key: true
-    cbr_weight: 0.20
+    cbr_weight: 0.05
     similarity:
       type: taxonomy
       hierarchy:
         OPASAN: [HEMIJSKI_OTPAD, RADIOAKTIVNI_OTPAD, NAFTNI_DERIVATI]
         BENIGN: [KOMUNALNI_OTPAD, OSTALO]
 
-  pollutionTarget:
-    type: enum
-    values: [VODA, VAZDUH, TLO, VISESTRUKO]
-    description: "Šta je zagađeno"
-    used_in_rules: [R1]
-    cbr_key: true
-    cbr_weight: 0.10
-
-  damageExtent:
-    type: enum
-    values: [LAKA, TESKA, NAROCITO_TESKA]
-    description: "Stepen prouzrokovane štete"
-    used_in_rules: [R2, R11, R12]
-    cbr_key: true
-    cbr_weight: 0.20
-    similarity:
-      type: ordinal
-      order: [LAKA, TESKA, NAROCITO_TESKA]
-
-  intent:
-    type: enum
-    values: [UMISLJAJ, NEHAT]
-    description: "Oblik krivice"
-    used_in_rules: [R3, R11]
-    cbr_key: true
-    cbr_weight: 0.10
-
-  # ===== BOOLEAN ČINJENICE =====
-
-  protectedSpecies:
-    type: boolean
-    description: "Da li je u pitanju zaštićena vrsta"
-    used_in_rules: [R7]
-    cbr_key: false
-
-  usesExplosives:
-    type: boolean
-    description: "Da li su korišćeni eksplozivi (lov/ribolov)"
-    used_in_rules: [R8]
-    cbr_key: false
-
   priorConviction:
     type: boolean
-    description: "Prethodna osuda za isto/slično delo"
-    used_in_rules: [R9]
+    description: "Prethodna osuda za isto/slično delo (otežavajuća okolnost)"
+    used_in_rules: []
     cbr_key: true
     cbr_weight: 0.05
 
   remediedDamage:
     type: boolean
-    description: "Da li je učinilac otklonio štetu pre suđenja"
-    used_in_rules: [R10]
+    description: "Učinilac otklonio štetu pre suđenja (olakšavajuća okolnost)"
+    used_in_rules: []
     cbr_key: true
     cbr_weight: 0.05
 
-  # ===== AKCIJE / PREDIKATI U PRAVILIMA =====
-  # Ovo nisu činjenice koje NLP izvlači, već relacije koje rule engine izvodi.
+  # ============================================================
+  # IZVEDENI PREDIKATI (ne ekstrahuje NLP - izvode pravila)
+  # ============================================================
 
   violates:
     type: relation
     arity: 2
-    description: "Lice X krši član Y"
-    derived: true   # Ne izvlači NLP, izvodi rule engine
+    description: "Lice X krši član Y (npr. art_260__para_1)"
+    derived: true
 
   sentenceRange:
     type: relation
     arity: 3
-    description: "Predloženi raspon kazne (od, do) za lice X"
+    description: "Predloženi raspon kazne (od, do) u mesecima za lice X"
     derived: true
 
-  aggravatedSentence:
+  applicableArticle:
     type: relation
-    arity: 1
-    description: "Otežavajuća okolnost - povećana kazna"
-    derived: true
-
-  mitigatedSentence:
-    type: relation
-    arity: 1
-    description: "Olakšavajuća okolnost - umanjena kazna"
+    arity: 2
+    description: "Identifikovani primenljiv član za slučaj"
     derived: true
