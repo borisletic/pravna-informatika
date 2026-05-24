@@ -1,7 +1,15 @@
 package rs.ftn.pi.reasoning.rule;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.Message;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.springframework.stereotype.Component;
 import rs.ftn.pi.config.AppConfig;
 import rs.ftn.pi.model.CaseFacts;
@@ -11,16 +19,38 @@ import rs.ftn.pi.reasoning.dto.ReasoningResult;
 import rs.ftn.pi.reasoning.dto.SentenceProposal;
 import rs.ftn.pi.reasoning.dto.ViolatedArticle;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Rule-based rasuđivanje preko dr-device alata.
+ * Rule-based rasuđivanje preko Drools engine-a.
  *
  * VLASNIK: Član 1 (Legal Modeling).
  * CELINA: 5.
  *
- * Trenutno MOCK implementacija - vraća deterministične dummy rezultate
- * da Član 3 može da razvija UI paralelno.
+ * NAPOMENA: Originalna specifikacija traži dr-device. Posle spike testa
+ * (videti: dr-device-spike/), zaključili smo da dr-device nije održiv izbor
+ * (JAR nedostupan / nekompatibilan sa Java 17 / itd.). Drools je odabran
+ * kao fallback. Razlog je dokumentovan u data/rules/REASONING_NOTES.md.
+ *
+ * Glavni izvor istine za pravila ostaje LegalRuleML
+ * (data/rules/environmental_rules.lrml), dok DRL fajl
+ * (data/rules/environmental_rules.drl) je njegova transpilacija.
+ *
+ * KAKO RADI:
+ *   1. Pri startu app-a, Drools učita DRL fajl i kompajlira pravila (jednom).
+ *   2. Za svaki novi slučaj:
+ *      a) Otvori KieSession
+ *      b) Ubaci CaseFacts kao činjenicu
+ *      c) Pokreni fireAllRules()
+ *      d) Pokupi DroolsConclusion objekte koje su pravila ispalila
+ *      e) Mapiraj ih u ReasoningResult
  */
 @Slf4j
 @Component
@@ -29,65 +59,268 @@ public class RuleReasoner implements Reasoner {
 
     private final AppConfig appConfig;
 
+    private KieContainer kieContainer;
+
+    @PostConstruct
+    public void initRules() {
+        log.info("Inicijalizacija Drools rule engine-a...");
+
+        String rulesPath = appConfig.getReasoning().getRulesFile();
+        // Konfiguracija očekuje LegalRuleML (.lrml), ali Drools koristi DRL.
+        // Konvencija: DRL fajl ima isto ime, ali sa .drl ekstenzijom.
+        String drlPath = rulesPath.replace(".lrml", ".drl");
+
+        try {
+            Path path = Paths.get(drlPath);
+            if (!Files.exists(path)) {
+                log.error("DRL fajl ne postoji: {}", drlPath);
+                log.error("Ostavi pravila na mock-u dok ne pripremis DRL.");
+                return;
+            }
+
+            String drlContent = Files.readString(path);
+
+            KieServices ks = KieServices.Factory.get();
+            KieFileSystem kfs = ks.newKieFileSystem();
+            kfs.write("src/main/resources/rules/environmental_rules.drl",
+                    ks.getResources()
+                      .newReaderResource(new java.io.StringReader(drlContent))
+                      .setResourceType(ResourceType.DRL)
+                      .setSourcePath("rules/environmental_rules.drl"));
+
+            KieBuilder kb = ks.newKieBuilder(kfs).buildAll();
+
+            if (kb.getResults().hasMessages(Message.Level.ERROR)) {
+                log.error("Drools build greske:");
+                kb.getResults().getMessages(Message.Level.ERROR)
+                  .forEach(m -> log.error("  {}", m.getText()));
+                return;
+            }
+
+            this.kieContainer = ks.newKieContainer(ks.getRepository().getDefaultReleaseId());
+            log.info("Drools engine inicijalizovan: ucitana pravila iz {}", drlPath);
+
+        } catch (Exception e) {
+            log.error("Greska pri inicijalizaciji Drools-a: {}", e.getMessage(), e);
+        }
+    }
+
     @Override
     public ReasoningResult reason(CaseFacts facts) {
-        log.info("RuleReasoner: rasuđivanje nad {} činjenicama", facts.getFacts().size());
+        log.info("RuleReasoner: rasudjivanje nad {} cinjenica", facts.getFacts().size());
 
-        // ========================================================
-        // TODO Član 1: Implementirati pravi dr-device poziv.
-        //
-        // Koraci:
-        //  1. Učitati LegalRuleML pravila iz appConfig.getReasoning().getRulesFile()
-        //     (npr. preko JAXB ili XML parsera; cache-ovati nakon prvog poziva)
-        //  2. Konvertovati CaseFacts u format koji dr-device razume
-        //     (najverovatnije RDF triples ili RuleML facts)
-        //  3. Pozvati dr-device engine
-        //  4. Iskoristi rezultate u ReasoningResult
-        //     - violatedArticles iz violates(X, art_*) atoma
-        //     - sentenceProposal iz sentenceRange(X, min, max) atoma
-        //     - derivations iz trace-a engine-a
-        //
-        // Fallback ako dr-device pravi problem: Drools sa DRL pravilima
-        // (transpilirati LegalRuleML -> DRL pomocnim skriptom)
-        // ========================================================
+        // Fallback na mock ako Drools nije inicijalizovan
+        if (kieContainer == null) {
+            log.warn("Drools nije dostupan - vracam mock rezultat");
+            return mockResult(facts);
+        }
 
-        return mockResult(facts);
+        KieSession session = kieContainer.newKieSession();
+        try {
+            // Globals - pravila pisu u ove liste
+            List<DroolsConclusion> conclusions = new ArrayList<>();
+            List<String> trace = new ArrayList<>();
+            session.setGlobal("conclusions", conclusions);
+            session.setGlobal("trace", trace);
+
+            // Ubaci činjenice
+            session.insert(facts);
+
+            // Pokreni pravila
+            int firedRules = session.fireAllRules();
+            log.info("Drools: ispaljeno {} pravila, {} zakljucaka",
+                    firedRules, conclusions.size());
+
+            return toReasoningResult(facts, conclusions, trace);
+
+        } finally {
+            session.dispose();
+        }
     }
 
     /**
-     * Mock - ostaje dok se ne implementira dr-device integracija.
-     * Vraća detereministične rezultate na osnovu prisutnih činjenica
-     * tako da Član 3 može da testira UI.
+     * Mapira Drools izlaz u ReasoningResult koji UI razume.
+     * Pravila biraju "najteži" violation - onaj sa najvećim maxMonths.
+     */
+    private ReasoningResult toReasoningResult(CaseFacts facts,
+                                              List<DroolsConclusion> conclusions,
+                                              List<String> trace) {
+        if (conclusions.isEmpty()) {
+            return ReasoningResult.builder()
+                    .reasonerType(ReasoningResult.ReasonerType.RULE_BASED)
+                    .explanation("Nijedno pravilo nije puklo nad zadatim cinjenicama. " +
+                                 "Mozda nedostaju kljucne cinjenice.")
+                    .build();
+        }
+
+        // Sortiraj po max kazne descending - najteži oblik je primarni
+        List<DroolsConclusion> sorted = new ArrayList<>(conclusions);
+        sorted.sort(Comparator.comparingInt(DroolsConclusion::getMaxMonths).reversed());
+
+        // Lista svih prekrsenih clanova
+        List<ViolatedArticle> violations = sorted.stream()
+                .map(c -> ViolatedArticle.builder()
+                        .articleEId(c.getArticleEId())
+                        .citation(articleEIdToCitation(c.getArticleEId()))
+                        .text("[Tekst clana iz kz.xml - TODO Clan 3: dohvatiti preko LawService]")
+                        .certainty("STRICT")
+                        .build())
+                .toList();
+
+        // Najteži clan postaje primarni predlog kazne
+        DroolsConclusion primary = sorted.get(0);
+        SentenceProposal sentence = SentenceProposal.builder()
+                .type(SentenceProposal.SentenceType.ZATVOR)
+                .minMonths(primary.getMinMonths())
+                .maxMonths(primary.getMaxMonths())
+                .proposedMonths((primary.getMinMonths() + primary.getMaxMonths()) / 2)
+                .adjustments(buildAdjustmentsNote(facts))
+                .build();
+
+        // Trag izvođenja
+        List<DerivationStep> derivations = new ArrayList<>();
+        for (int i = 0; i < sorted.size(); i++) {
+            DroolsConclusion c = sorted.get(i);
+            derivations.add(DerivationStep.builder()
+                    .ruleId(c.getRuleId())
+                    .ruleDescription(ruleDescription(c.getRuleId()))
+                    .matchedFacts(matchedFactsForRule(c.getRuleId(), facts))
+                    .conclusion("violates(person, " + c.getArticleEId() + "), " +
+                               "sentenceRange(" + c.getMinMonths() + "m, " + c.getMaxMonths() + "m)")
+                    .build());
+        }
+
+        return ReasoningResult.builder()
+                .reasonerType(ReasoningResult.ReasonerType.RULE_BASED)
+                .violatedArticles(violations)
+                .sentenceProposal(sentence)
+                .derivations(derivations)
+                .explanation(buildExplanation(sorted, facts))
+                .build();
+    }
+
+    /**
+     * Pretvara art_260__para_1 -> "KZ čl. 260 st. 1".
+     */
+    private String articleEIdToCitation(String eId) {
+        if (eId == null) return "?";
+        // art_260__para_1 -> 260, 1
+        String[] parts = eId.split("__");
+        String artPart = parts[0].replace("art_", "");
+        if (parts.length > 1) {
+            String parPart = parts[1].replace("para_", "");
+            return "KZ čl. " + artPart + " st. " + parPart;
+        }
+        return "KZ čl. " + artPart;
+    }
+
+    /**
+     * Olakšavajuće / otežavajuće okolnosti (zasad samo prikaz, kasnije
+     * možemo to ulaganjem u defeasible pravila).
+     */
+    private String buildAdjustmentsNote(CaseFacts facts) {
+        List<String> notes = new ArrayList<>();
+        if (Boolean.TRUE.equals(facts.get("priorConviction"))) {
+            notes.add("otezavajuca: prethodno osudjivan");
+        }
+        if (Boolean.TRUE.equals(facts.get("remediedDamage"))) {
+            notes.add("olaksavajuca: otklonio stetu");
+        }
+        return notes.isEmpty() ? null : String.join("; ", notes);
+    }
+
+    /**
+     * Opis pravila za UI - kasnije može da se učita iz LegalRuleML komentara.
+     */
+    private static final Map<String, String> RULE_DESCRIPTIONS = Map.ofEntries(
+            Map.entry("R1", "Zagadjenje zivotne sredine sa umisljajem"),
+            Map.entry("R2", "Zagadjenje zivotne sredine iz nehata"),
+            Map.entry("R3", "Kvalifikovani oblik (umisljaj + velike razmere stete)"),
+            Map.entry("R4", "Kvalifikovani oblik (nehat + velike razmere stete)"),
+            Map.entry("R5", "Nepreduzimanje propisanih mera zastite"),
+            Map.entry("R6", "Protivpravna izgradnja zagadjujucih objekata"),
+            Map.entry("R7", "Ostecenje objekata za zastitu zivotne sredine"),
+            Map.entry("R8", "Unistenje posebno zasticenog prirodnog dobra"),
+            Map.entry("R9", "Protivpravno iznosenje zasticene vrste"),
+            Map.entry("R10", "Opasne materije - osnovni oblik"),
+            Map.entry("R11", "Opasne materije sa zloupotrebom polozaja"),
+            Map.entry("R12", "Organizovanje vrsenja sa opasnim materijama"),
+            Map.entry("R13", "Nedozvoljena izgradnja nuklearnog postrojenja"),
+            Map.entry("R14", "Uskracivanje podataka o stanju zivotne sredine")
+    );
+
+    private String ruleDescription(String ruleId) {
+        return RULE_DESCRIPTIONS.getOrDefault(ruleId, "(nepoznato pravilo)");
+    }
+
+    /**
+     * Vraca koje cinjenice su zadovoljile uslove pravila - za prikaz UI.
+     * Za sad gruba aproksimacija; kasnije moze finije.
+     */
+    private List<String> matchedFactsForRule(String ruleId, CaseFacts facts) {
+        Map<String, List<String>> matchers = new HashMap<>();
+        matchers.put("R1", List.of("violatedEnvironmentalRegs", "pollutionTarget",
+                "pollutionExtent", "pollutionScope", "intent"));
+        matchers.put("R2", List.of("violatedEnvironmentalRegs", "pollutionTarget",
+                "pollutionExtent", "pollutionScope", "intent"));
+        matchers.put("R3", List.of("ecologicalDamage", "damageRemovalDifficulty"));
+        matchers.put("R4", List.of("ecologicalDamage", "damageRemovalDifficulty"));
+        matchers.put("R5", List.of("perpetratorType", "failedToTakeProtectiveMeasures"));
+        matchers.put("R6", List.of("perpetratorType", "unauthorizedConstruction",
+                "pollutionExtent", "pollutionScope"));
+        matchers.put("R7", List.of("damagedProtectionEquipment"));
+        matchers.put("R8", List.of("destroyedProtectedNaturalAsset"));
+        matchers.put("R9", List.of("illegalSpeciesTraffic"));
+        matchers.put("R10", List.of("dangerousSubstanceAction"));
+        matchers.put("R11", List.of("dangerousSubstanceAction", "officialPositionAbuse"));
+        matchers.put("R12", List.of("dangerousSubstanceAction", "organizesCrime"));
+        matchers.put("R13", List.of("unauthorizedNuclearFacility"));
+        matchers.put("R14", List.of("deniedEnvironmentalInfo"));
+
+        List<String> relevant = matchers.getOrDefault(ruleId, List.of());
+        List<String> result = new ArrayList<>();
+        for (String predicate : relevant) {
+            Object value = facts.get(predicate);
+            if (value != null) {
+                result.add(predicate + " = " + value);
+            }
+        }
+        return result;
+    }
+
+    private String buildExplanation(List<DroolsConclusion> conclusions, CaseFacts facts) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Na osnovu navedenih cinjenica, sistem je zakljucio da je ucinilac ");
+        sb.append("prekrsio ").append(conclusions.size()).append(" odredb")
+          .append(conclusions.size() == 1 ? "u" : "i").append(" KZ-a. ");
+        sb.append("Najtezi oblik je ").append(articleEIdToCitation(conclusions.get(0).getArticleEId()))
+          .append(" sa predvidjenom kaznom u rasponu ")
+          .append(conclusions.get(0).getMinMonths()).append("-")
+          .append(conclusions.get(0).getMaxMonths()).append(" meseci.");
+
+        String adj = buildAdjustmentsNote(facts);
+        if (adj != null) {
+            sb.append(" Okolnosti: ").append(adj).append(".");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Mock - koristi se ako Drools nije inicijalizovan (npr. DRL fajl ne postoji).
      */
     private ReasoningResult mockResult(CaseFacts facts) {
         ViolatedArticle article = ViolatedArticle.builder()
                 .articleEId("art_260__para_1")
-                .citation("KZ čl. 260 st. 1 (zagađenje životne sredine)")
-                .text("[MOCK] Ko kršenjem propisa o zaštiti, očuvanju i unapređenju životne sredine zagadi vodu, vazduh ili zemljište...")
-                .certainty("DEFEASIBLE")
-                .build();
-
-        SentenceProposal sentence = SentenceProposal.builder()
-                .type(SentenceProposal.SentenceType.ZATVOR)
-                .minMonths(6)
-                .maxMonths(60)
-                .proposedMonths(18)
-                .adjustments("MOCK - bez stvarnog izvođenja")
-                .build();
-
-        DerivationStep step = DerivationStep.builder()
-                .ruleId("R1-MOCK")
-                .ruleDescription("MOCK pravilo (zameniti pravom dr-device integracijom)")
-                .matchedFacts(List.of(facts.getFacts().keySet().toString()))
-                .conclusion("violates(X, art_260_para_1)")
+                .citation("KZ čl. 260 st. 1")
+                .text("[MOCK] Drools nije inicijalizovan.")
+                .certainty("STRICT")
                 .build();
 
         return ReasoningResult.builder()
                 .reasonerType(ReasoningResult.ReasonerType.RULE_BASED)
                 .violatedArticles(List.of(article))
-                .sentenceProposal(sentence)
-                .derivations(List.of(step))
-                .explanation("[MOCK] Pravi rule reasoner još nije implementiran.")
+                .explanation("[MOCK] Pravi rule reasoner nije inicijalizovan - " +
+                             "proveri da li environmental_rules.drl postoji.")
                 .build();
     }
 }

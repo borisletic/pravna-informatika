@@ -94,21 +94,21 @@
             <scope>test</scope>
         </dependency>
 
-        <!--
-            TODO Član 1: Dodati dr-device zavisnost.
-            dr-device nije na Maven Central. Opcije:
-              (a) skinuti JAR sa http://lpis.csd.auth.gr/systems/dr-device.html
-                  i staviti u app/libs/ + system scope dependency
-              (b) install:install-file lokalno u .m2
-
-            <dependency>
-                <groupId>gr.auth.csd</groupId>
-                <artifactId>dr-device</artifactId>
-                <version>2.x</version>
-                <scope>system</scope>
-                <systemPath>${project.basedir}/libs/dr-device.jar</systemPath>
-            </dependency>
-        -->
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-engine</artifactId>
+            <version>8.44.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-mvel</artifactId>
+            <version>8.44.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-internal</artifactId>
+            <version>8.44.0.Final</version>
+        </dependency>
 
         <!--
             TODO Član 2: Dodati jColibri zavisnost.
