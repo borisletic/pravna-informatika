@@ -15,55 +15,90 @@
     <h1>Rezultat rasuđivanja</h1>
 
     <div class="row mt-4">
-        <!-- Leva kolona: Rule-based -->
+        <!-- ====================================================
+             LEVA KOLONA: RULE-BASED
+             ==================================================== -->
         <div class="col-md-4">
             <div class="card h-100">
                 <div class="card-header bg-primary text-white">
                     <strong>Rasuđivanje po pravilima</strong>
                 </div>
                 <div class="card-body">
-                    <h6>Prekršeni članovi:</h6>
-                    <ul>
-                        <li th:each="art : ${result.ruleBasedResult.violatedArticles}">
-                            <strong th:text="${art.citation}">čl. X</strong>
-                            <p class="small text-muted" th:text="${art.text}"></p>
-                        </li>
-                    </ul>
-
-                    <div th:if="${result.ruleBasedResult.sentenceProposal}" class="mt-3">
-                        <h6>Predlog kazne:</h6>
-                        <p>
-                            <span class="badge bg-info" th:text="${result.ruleBasedResult.sentenceProposal.type}"></span>
-                            <span th:text="${result.ruleBasedResult.sentenceProposal.minMonths} + ' - ' + ${result.ruleBasedResult.sentenceProposal.maxMonths} + ' meseci'"></span>
+                    <!-- Slučaj: nema prekršenih članova -->
+                    <div th:if="${#lists.isEmpty(result.ruleBasedResult.violatedArticles)}"
+                         class="alert alert-warning">
+                        <strong>Nijedno pravilo nije puknulo.</strong>
+                        <p class="small mb-0 mt-2"
+                           th:text="${result.ruleBasedResult.explanation}">
+                            Možda nedostaju ključne činjenice.
                         </p>
                     </div>
 
-                    <div class="mt-3">
-                        <h6>Izvedeno:</h6>
-                        <ul class="small">
-                            <li th:each="d : ${result.ruleBasedResult.derivations}">
-                                <strong th:text="${d.ruleId}"></strong>:
-                                <span th:text="${d.conclusion}"></span>
+                    <!-- Slučaj: ima prekršenih članova -->
+                    <div th:unless="${#lists.isEmpty(result.ruleBasedResult.violatedArticles)}">
+                        <h6>Prekršeni članovi:</h6>
+                        <ul>
+                            <li th:each="art : ${result.ruleBasedResult.violatedArticles}">
+                                <strong th:text="${art.citation}">čl. X</strong>
+                                <p class="small text-muted" th:text="${art.text}"></p>
                             </li>
                         </ul>
+
+                        <div th:if="${result.ruleBasedResult.sentenceProposal != null}" class="mt-3">
+                            <h6>Predlog kazne:</h6>
+                            <p>
+                                <span class="badge bg-info"
+                                      th:text="${result.ruleBasedResult.sentenceProposal.type}"></span>
+                                <span th:text="${result.ruleBasedResult.sentenceProposal.minMonths} + ' - ' + ${result.ruleBasedResult.sentenceProposal.maxMonths} + ' meseci'"></span>
+                            </p>
+                            <p class="small text-muted"
+                               th:if="${result.ruleBasedResult.sentenceProposal.adjustments != null}"
+                               th:text="'Okolnosti: ' + ${result.ruleBasedResult.sentenceProposal.adjustments}">
+                            </p>
+                        </div>
+
+                        <div class="mt-3"
+                             th:unless="${#lists.isEmpty(result.ruleBasedResult.derivations)}">
+                            <h6>Izvedeno:</h6>
+                            <ul class="small">
+                                <li th:each="d : ${result.ruleBasedResult.derivations}">
+                                    <strong th:text="${d.ruleId}"></strong>:
+                                    <span th:text="${d.conclusion}"></span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-3 small text-muted"
+                             th:if="${result.ruleBasedResult.explanation != null}"
+                             th:text="${result.ruleBasedResult.explanation}">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sredina: CBR -->
+        <!-- ====================================================
+             SREDINA: CBR
+             ==================================================== -->
         <div class="col-md-4">
             <div class="card h-100">
                 <div class="card-header bg-success text-white">
                     <strong>Slični slučajevi (CBR)</strong>
                 </div>
                 <div class="card-body">
-                    <div th:each="sc : ${result.caseBasedResult.similarCases}" class="border-bottom pb-2 mb-2">
+                    <div th:if="${#lists.isEmpty(result.caseBasedResult.similarCases)}"
+                         class="alert alert-info">
+                        Nema sličnih slučajeva u bazi.
+                    </div>
+
+                    <div th:each="sc : ${result.caseBasedResult.similarCases}"
+                         class="border-bottom pb-2 mb-2">
                         <strong th:text="${sc.sourceJudgmentId}">K-X/Y</strong>
-                        <span class="badge bg-secondary" th:text="${#numbers.formatPercent(sc.similarity, 1, 1)}">87%</span>
+                        <span class="badge bg-secondary"
+                              th:text="${#numbers.formatPercent(sc.similarity, 1, 1)}">87%</span>
                         <p class="small mb-1">
                             Ishod: <span th:text="${sc.articleViolated}"></span>,
-                            <span th:if="${sc.sentence}"
+                            <span th:if="${sc.sentence != null}"
                                   th:text="${sc.sentence.proposedMonths} + ' meseci ' + ${sc.sentence.type}"></span>
                         </p>
                     </div>
@@ -71,7 +106,9 @@
             </div>
         </div>
 
-        <!-- Desno: Odluka korisnika -->
+        <!-- ====================================================
+             DESNO: ODLUKA KORISNIKA
+             ==================================================== -->
         <div class="col-md-4">
             <div class="card h-100">
                 <div class="card-header bg-warning">
@@ -87,7 +124,9 @@
                         <div class="mb-3">
                             <label class="form-label">Prekršeni član</label>
                             <input type="text" class="form-control" name="articleViolated"
-                                   th:value="${result.ruleBasedResult.violatedArticles[0]?.articleEId}"/>
+                                   th:value="${not #lists.isEmpty(result.ruleBasedResult.violatedArticles)
+                                              ? result.ruleBasedResult.violatedArticles[0].articleEId
+                                              : ''}"/>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Vrsta kazne</label>
@@ -101,7 +140,9 @@
                         <div class="mb-3">
                             <label class="form-label">Dužina (meseci)</label>
                             <input type="number" class="form-control" name="sentenceMonths"
-                                   th:value="${result.ruleBasedResult.sentenceProposal?.proposedMonths}"/>
+                                   th:value="${result.ruleBasedResult.sentenceProposal != null
+                                              ? result.ruleBasedResult.sentenceProposal.proposedMonths
+                                              : ''}"/>
                         </div>
                         <button type="submit" class="btn btn-warning w-100">Sačuvaj slučaj</button>
                     </form>
