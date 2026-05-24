@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: pravna-informatika
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pravna_informatika
+    username: pi_user
+    password: pi_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate    # Flyway upravlja šemom, JPA samo validira
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  thymeleaf:
+    cache: false   # development - kasnije true za prod
+
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+# Aplikacijski parametri
+app:
+  data-dir: ${user.dir}/../data
+  nlp:
+    base-url: http://localhost:8000
+    timeout-seconds: 30
+  reasoning:
+    rules-file: ${app.data-dir}/rules/environmental_rules.lrml
+    cases-file: ${app.data-dir}/cases/cases.csv
+    predicate-dict: ${app.data-dir}/schemas/predicate_dictionary.yaml
+
+logging:
+  level:
+    rs.ftn.pi: DEBUG
+    org.springframework.web: INFO

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="sr">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Zakoni</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">Pravna informatika</a>
+    </div>
+</nav>
+<main class="container mt-4">
+    <h1>Zakoni</h1>
+    <div th:if="${#lists.isEmpty(laws)}" class="alert alert-info">
+        Nema učitanih zakona. Stavi Akoma Ntoso XML fajl u <code>data/laws/</code>.
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item" th:each="law : ${laws}">
+            <a th:href="@{'/laws/' + ${law.id}}" th:text="${law.title}">Naziv zakona</a>
+        </li>
+    </ul>
+</main>
+</body>
+</html>

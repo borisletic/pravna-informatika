@@ -1,0 +1,46 @@
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Spring
+application-local.properties
+application-local.yml
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Models (preveliki za git)
+nlp-service/models/*.bin
+nlp-service/models/*.pt
+nlp-service/models/*.safetensors
+
+# Privremeni izlazi
+/tmp/
+*.tmp

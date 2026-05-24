@@ -1,0 +1,59 @@
+/* Pravna informatika - osnovni stilovi */
+
+body {
+    font-family: 'Times New Roman', Georgia, serif;
+}
+
+.law-content, .judgment-content {
+    background: #fff;
+    padding: 2rem;
+    border: 1px solid #dee2e6;
+    border-radius: .25rem;
+    line-height: 1.7;
+}
+
+/* Anotacije unutar XSLT izlaza */
+.law-content .ref,
+.judgment-content .ref {
+    color: #0d6efd;
+    text-decoration: none;
+    border-bottom: 1px dotted #0d6efd;
+    cursor: pointer;
+}
+
+.law-content .article {
+    margin-bottom: 1.5rem;
+}
+
+.law-content .article-num,
+.judgment-content .case-num {
+    font-weight: bold;
+    color: #1F3864;
+}
+
+.law-content .article-heading {
+    font-style: italic;
+    margin-bottom: .5rem;
+}
+
+/* Highlight kada se skroluje na referencu */
+.law-content .article:target {
+    background: #fff3cd;
+    padding: 1rem;
+    border-radius: .25rem;
+    transition: background 1s ease;
+}
+
+/* Ekstrahovane činjenice u prikazu odluke */
+.extracted-fact {
+    background: #e7f3ff;
+    border-left: 3px solid #0d6efd;
+    padding: 4px 8px;
+    margin: 4px 0;
+    font-size: .9rem;
+}
+
+.extracted-fact .confidence {
+    font-size: .8rem;
+    color: #6c757d;
+}

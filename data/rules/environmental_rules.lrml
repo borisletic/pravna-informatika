@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Pravila za rasuđivanje u oblasti krivičnih dela protiv životne sredine.
+  Vlasnik: Član 1 (Legal Modeling).
+  Celina: 3.
+
+  Trenutno - JEDAN ogledni rule. Treba minimum 10 (videti predloge u
+  Struktura_projekta.docx, sekcija "Predložena pravila").
+
+  Svi predikati moraju biti definisani u
+  data/schemas/predicate_dictionary.yaml.
+-->
+<lrml:LegalRuleML
+    xmlns:lrml="http://docs.oasis-open.org/legalruleml/ns/v1.0/"
+    xmlns:ruleml="http://www.ruleml.org/spec">
+
+  <lrml:Associations>
+    <lrml:Association>
+      <lrml:appliesSource keyref="#kz_art_260_para_1"/>
+      <lrml:toTarget keyref="#rule_R1_polution_basic"/>
+    </lrml:Association>
+  </lrml:Associations>
+
+  <lrml:Statements>
+
+    <!-- ============================================================ -->
+    <!-- R1: Osnovno pravilo zagađenja                                -->
+    <!--    AKO osoba ispusti više od 10 m³ supstance                 -->
+    <!--    ONDA krši čl. 260 st. 1                                   -->
+    <!-- ============================================================ -->
+    <lrml:PrescriptiveStatement key="rule_R1_polution_basic">
+      <ruleml:Rule>
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel>substanceQuantityM3</ruleml:Rel>
+              <ruleml:Var>q</ruleml:Var>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel>greaterThan</ruleml:Rel>
+              <ruleml:Var>q</ruleml:Var>
+              <ruleml:Ind>10</ruleml:Ind>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates</ruleml:Rel>
+            <ruleml:Var>person</ruleml:Var>
+            <ruleml:Ind>art_260__para_1</ruleml:Ind>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- ============================================================ -->
+    <!-- TODO Član 1: dopuniti ostalih 11 pravila.                    -->
+    <!-- Lista u Struktura_projekta.docx (Celina 3 / Predložena       -->
+    <!-- pravila):                                                    -->
+    <!--   R2: violates(X, 260/1) ∧ damageExtent=TESKA → 260/2        -->
+    <!--   R3: violates(X, 260/1) ∧ intent=NEHAT → reducedPenalty    -->
+    <!--   R4: notInstallsProtectionDevice(X) → 262                   -->
+    <!--   R5: damagesProtectionFacility(X) → 263                    -->
+    <!--   R6: destroysForest(X) ∧ forestAreaHa>1 → 274              -->
+    <!--   R7: illegalHunting(X) ∧ protectedSpecies=true → 276        -->
+    <!--   R8: illegalFishing(X) ∧ usesExplosives=true → 277          -->
+    <!--   R9: violates(X,_) ∧ priorConviction=true → aggravated      -->
+    <!--   R10: violates(X,_) ∧ remediedDamage=true → mitigated       -->
+    <!--   R11: violates(X, 260/2) → sentenceRange(1y, 8y)            -->
+    <!--   R12: violates(X, 260/1) → sentenceRange(6m, 5y)            -->
+    <!-- ============================================================ -->
+
+  </lrml:Statements>
+</lrml:LegalRuleML>

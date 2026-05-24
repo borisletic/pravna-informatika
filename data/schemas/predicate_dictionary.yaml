@@ -1,0 +1,135 @@
+# Rečnik činjenica — UGOVOR između Člana 1 (pravila) i Člana 2 (NLP, CBR)
+#
+# Ovo je polazni skup. Dodavanje novih predikata = poruka u grupi + bump verzije.
+# Brisanje predikata = NIKAD bez dogovora (lome se i pravila i NLP).
+#
+# Verzija: 0.1.0
+# Poslednja izmena: SETUP
+
+version: "0.1.0"
+
+predicates:
+
+  # ===== KVANTITATIVNE ČINJENICE =====
+
+  substanceQuantityM3:
+    type: number
+    unit: "m^3"
+    description: "Količina ispuštene supstance u kubnim metrima"
+    nlp_patterns:
+      - '\d+(?:[.,]\d+)?\s*(?:m³|m3|кубних метара|kubnih metara)'
+    used_in_rules: [R1, R3]
+    cbr_key: true
+    cbr_weight: 0.20
+
+  forestAreaHa:
+    type: number
+    unit: "ha"
+    description: "Površina uništene/oštećene šume u hektarima"
+    nlp_patterns:
+      - '\d+(?:[.,]\d+)?\s*(?:ha|хектара|hektara)'
+    used_in_rules: [R6]
+    cbr_key: true
+    cbr_weight: 0.10
+
+  # ===== KATEGORIJALNE ČINJENICE =====
+
+  substanceType:
+    type: enum
+    values:
+      - HEMIJSKI_OTPAD
+      - RADIOAKTIVNI_OTPAD
+      - KOMUNALNI_OTPAD
+      - NAFTNI_DERIVATI
+      - OSTALO
+    description: "Tip ispuštene/odlozenо supstance"
+    used_in_rules: [R1, R2]
+    cbr_key: true
+    cbr_weight: 0.20
+    similarity:
+      type: taxonomy
+      hierarchy:
+        OPASAN: [HEMIJSKI_OTPAD, RADIOAKTIVNI_OTPAD, NAFTNI_DERIVATI]
+        BENIGN: [KOMUNALNI_OTPAD, OSTALO]
+
+  pollutionTarget:
+    type: enum
+    values: [VODA, VAZDUH, TLO, VISESTRUKO]
+    description: "Šta je zagađeno"
+    used_in_rules: [R1]
+    cbr_key: true
+    cbr_weight: 0.10
+
+  damageExtent:
+    type: enum
+    values: [LAKA, TESKA, NAROCITO_TESKA]
+    description: "Stepen prouzrokovane štete"
+    used_in_rules: [R2, R11, R12]
+    cbr_key: true
+    cbr_weight: 0.20
+    similarity:
+      type: ordinal
+      order: [LAKA, TESKA, NAROCITO_TESKA]
+
+  intent:
+    type: enum
+    values: [UMISLJAJ, NEHAT]
+    description: "Oblik krivice"
+    used_in_rules: [R3, R11]
+    cbr_key: true
+    cbr_weight: 0.10
+
+  # ===== BOOLEAN ČINJENICE =====
+
+  protectedSpecies:
+    type: boolean
+    description: "Da li je u pitanju zaštićena vrsta"
+    used_in_rules: [R7]
+    cbr_key: false
+
+  usesExplosives:
+    type: boolean
+    description: "Da li su korišćeni eksplozivi (lov/ribolov)"
+    used_in_rules: [R8]
+    cbr_key: false
+
+  priorConviction:
+    type: boolean
+    description: "Prethodna osuda za isto/slično delo"
+    used_in_rules: [R9]
+    cbr_key: true
+    cbr_weight: 0.05
+
+  remediedDamage:
+    type: boolean
+    description: "Da li je učinilac otklonio štetu pre suđenja"
+    used_in_rules: [R10]
+    cbr_key: true
+    cbr_weight: 0.05
+
+  # ===== AKCIJE / PREDIKATI U PRAVILIMA =====
+  # Ovo nisu činjenice koje NLP izvlači, već relacije koje rule engine izvodi.
+
+  violates:
+    type: relation
+    arity: 2
+    description: "Lice X krši član Y"
+    derived: true   # Ne izvlači NLP, izvodi rule engine
+
+  sentenceRange:
+    type: relation
+    arity: 3
+    description: "Predloženi raspon kazne (od, do) za lice X"
+    derived: true
+
+  aggravatedSentence:
+    type: relation
+    arity: 1
+    description: "Otežavajuća okolnost - povećana kazna"
+    derived: true
+
+  mitigatedSentence:
+    type: relation
+    arity: 1
+    description: "Olakšavajuća okolnost - umanjena kazna"
+    derived: true

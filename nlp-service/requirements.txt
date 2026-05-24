@@ -1,0 +1,20 @@
+# Pravna informatika - NLP servis
+# VLASNIK: Član 2
+
+# Web framework
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+pydantic==2.7.1
+
+# NLP - osnovni
+# classla je glavni za srpski jezik
+# classla==2.1.0       # otkomentariši kad se inicijalizuje pravi NLP
+
+# Opciono (skidanje preko HF transformers za BERTić, XLM-R)
+# transformers==4.40.0
+# torch==2.3.0
+# sentencepiece==0.2.0
+
+# Testiranje
+pytest==8.2.0
+httpx==0.27.0

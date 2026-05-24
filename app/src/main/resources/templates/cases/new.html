@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="sr">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Novi slučaj</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container"><a class="navbar-brand" th:href="@{/}">Pravna informatika</a></div>
+</nav>
+<main class="container mt-4">
+    <h1>Unos novog slučaja</h1>
+    <p class="text-muted">Unesite činjenice ili tekstualni opis. Sistem će pokrenuti
+        rasuđivanje po pravilima i po sličnim slučajevima.</p>
+
+    <form th:action="@{/cases/reason}" method="post">
+        <div class="mb-3">
+            <label class="form-label">Opis slučaja (slobodan tekst)</label>
+            <textarea class="form-control" name="description" rows="4"
+                      placeholder="npr. Osumnjičeni je 15.3. ispustio oko 12 m³ hemijskog otpada u reku..."></textarea>
+            <div class="form-text">Ako uneste tekst, NLP će pokušati da ekstrahuje činjenice automatski.
+                Ispod možete ručno dodati ili ispraviti činjenice.</div>
+        </div>
+
+        <hr/>
+        <h5>Strukturirane činjenice</h5>
+        <p class="text-muted small">
+            TODO Član 3: ova forma će se dinamički generisati iz
+            <code>predicate_dictionary.yaml</code>. Trenutno - statički primer.
+        </p>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Količina supstance (m³)</label>
+                <input type="number" step="0.1" class="form-control" name="facts[substanceQuantityM3]"/>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Tip supstance</label>
+                <select class="form-select" name="facts[substanceType]">
+                    <option value="">-- odaberi --</option>
+                    <option value="HEMIJSKI_OTPAD">Hemijski otpad</option>
+                    <option value="RADIOAKTIVNI_OTPAD">Radioaktivni otpad</option>
+                    <option value="KOMUNALNI_OTPAD">Komunalni otpad</option>
+                    <option value="NAFTNI_DERIVATI">Naftni derivati</option>
+                    <option value="OSTALO">Ostalo</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Cilj zagađenja</label>
+                <select class="form-select" name="facts[pollutionTarget]">
+                    <option value="">-- odaberi --</option>
+                    <option value="VODA">Voda</option>
+                    <option value="VAZDUH">Vazduh</option>
+                    <option value="TLO">Tlo</option>
+                    <option value="VISESTRUKO">Višestruko</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Stepen štete</label>
+                <select class="form-select" name="facts[damageExtent]">
+                    <option value="">-- odaberi --</option>
+                    <option value="LAKA">Laka</option>
+                    <option value="TESKA">Teška</option>
+                    <option value="NAROCITO_TESKA">Naročito teška</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Oblik krivice</label>
+                <select class="form-select" name="facts[intent]">
+                    <option value="">-- odaberi --</option>
+                    <option value="UMISLJAJ">Umišljaj</option>
+                    <option value="NEHAT">Nehat</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="facts[priorConviction]" value="true"/>
+                    <label class="form-check-label">Prethodno osuđivan</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="facts[remediedDamage]" value="true"/>
+                    <label class="form-check-label">Otklonio štetu</label>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary mt-4" type="submit">Pokreni rasuđivanje</button>
+    </form>
+</main>
+</body>
+</html>

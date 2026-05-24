@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="sr">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Sudske odluke</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container"><a class="navbar-brand" th:href="@{/}">Pravna informatika</a></div>
+</nav>
+<main class="container mt-4">
+    <h1>Sudske odluke</h1>
+    <div th:if="${#lists.isEmpty(judgments)}" class="alert alert-info">
+        Nema učitanih odluka. Stavi Akoma Ntoso XML fajl u <code>data/judgments/</code>.
+    </div>
+    <table class="table table-striped">
+        <thead><tr><th>Broj predmeta</th><th>Sud</th><th>Datum</th><th></th></tr></thead>
+        <tbody>
+            <tr th:each="j : ${judgments}">
+                <td th:text="${j.caseNumber}">K-145/2019</td>
+                <td th:text="${j.court}">Viši sud</td>
+                <td th:text="${j.date}">2019-04-12</td>
+                <td><a th:href="@{'/judgments/' + ${j.id}}" class="btn btn-sm btn-outline-primary">Otvori</a></td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pravna_informatika
+    username: pi_user
+    password: pi_password
+  flyway:
+    enabled: true
+
+app:
+  data-dir: ${user.dir}/../data
+  nlp:
+    base-url: http://localhost:8000
+    timeout-seconds: 5
+  reasoning:
+    rules-file: ${app.data-dir}/rules/environmental_rules.lrml
+    cases-file: ${app.data-dir}/cases/cases.csv
+    predicate-dict: ${app.data-dir}/schemas/predicate_dictionary.yaml
