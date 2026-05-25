@@ -1,6 +1,6 @@
 # Pravna informatika 2025/2026 — Krivična dela protiv životne sredine
 
-Sistem za podršku odlučivanju u krivičnim predmetima vezanim za životnu sredinu (KZ čl. 260–268).
+Sistem za podršku odlučivanju u krivičnim predmetima vezanim za životnu sredinu (KZ čl. 260–278).
 
 ## Tim i podela
 
