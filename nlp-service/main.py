@@ -1,18 +1,13 @@
 """
 NLP mikroservis za pravnu informatiku.
-
 VLASNIK: Član 2 (NLP & Data).
 CELINA: 4.
-
-Pokretanje:
-    uvicorn main:app --reload --port 8000
-
-UGOVOR sa Spring app: videti docs/INTEGRATION_CONTRACTS.md sekcija 3.
 """
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional
 
+# Importi iz podfoldera 'extractors'
 from extractors.metadata_extractor import extract_metadata
 from extractors.fact_extractor import extract_facts
 
@@ -21,17 +16,17 @@ app = FastAPI(
     version="0.1.0",
 )
 
-
+# ==========================================
+# Pydantic šeme (Ugovor sa Spring aplikacijom)
+# ==========================================
 class ExtractRequest(BaseModel):
     text: str
-    documentType: str  # "JUDGMENT" ili "CASE_DESCRIPTION"
+    documentType: str = "JUDGMENT"
     options: Optional[Dict[str, Any]] = None
-
 
 class SourceSpan(BaseModel):
     start: int
     end: int
-
 
 class Fact(BaseModel):
     predicate: str
@@ -39,11 +34,9 @@ class Fact(BaseModel):
     confidence: float
     sourceSpan: Optional[SourceSpan] = None
 
-
 class Party(BaseModel):
     role: str
     initials: str
-
 
 class Metadata(BaseModel):
     caseNumber: Optional[str] = None
@@ -53,28 +46,30 @@ class Metadata(BaseModel):
     judges: List[str] = []
     recorder: Optional[str] = None
 
-
 class ExtractResponse(BaseModel):
     metadata: Metadata
     facts: List[Fact]
 
-
+# ==========================================
+# API Endpoints
+# ==========================================
 @app.get("/health")
 def health():
-    return {"status": "ok"}
-
+    return {"status": "ok", "message": "NLP Mikroservis je aktivan!"}
 
 @app.post("/extract", response_model=ExtractResponse)
 def extract(req: ExtractRequest):
-    """
-    Glavni endpoint - poziva ga Spring app.
+    options = req.options or {}
+    include_meta = options.get("includeMetadata", True)
+    include_facts = options.get("includeFacts", True)
 
-    Trenutno - MOCK. TODO Član 2: implementirati prave ekstraktore.
-    """
-    include_meta = (req.options or {}).get("includeMetadata", True)
-    include_facts = (req.options or {}).get("includeFacts", True)
+    meta = Metadata()
+    facts = []
 
-    metadata = extract_metadata(req.text) if include_meta else Metadata()
-    facts = extract_facts(req.text) if include_facts else []
+    if include_meta:
+        meta = extract_metadata(req.text)
+        
+    if include_facts:
+        facts = extract_facts(req.text)
 
-    return ExtractResponse(metadata=metadata, facts=facts)
+    return ExtractResponse(metadata=meta, facts=facts)
