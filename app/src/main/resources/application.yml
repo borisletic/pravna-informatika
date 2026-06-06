@@ -32,8 +32,14 @@ server:
       force: true
 
 # Aplikacijski parametri
+#
+# data-dir: putanja do data/ foldera. Default je apsolutna putanja
+# do data/ foldera u repou. Može se overrajdovati sa env varijablom DATA_DIR.
+#
+# NAPOMENA: ne koristimo ${user.dir} jer zavisi od toga gde se pokreće aplikacija
+# (iz IntelliJ root-a, iz app/, iz mvn spring-boot:run u app/, itd).
 app:
-  data-dir: ${user.dir}/../data
+  data-dir: ${DATA_DIR:./data}
   nlp:
     base-url: http://localhost:8000
     timeout-seconds: 30

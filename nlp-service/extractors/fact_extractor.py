@@ -85,7 +85,7 @@ def extract_facts(text: str) -> List:
         add_fact("substanceType", "ZIVOTINJE_RIBE", 0.85)
 
     # === 9. articleViolated (Prekršeni član zakona) ===
-    m_art = re.search(r'\bчл(?:ан|ана|\.)?\s*(26[0-9]|27[0-8])\b', text_lower)
+    m_art = re.search(r'\bчл(?:ан|ана|\.)?\s*(26[0-9]|27[0-7])\b', text_lower)
     if m_art:
         add_fact("articleViolated", f"art_{m_art.group(1)}", 0.9, m_art)
 

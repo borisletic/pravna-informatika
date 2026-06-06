@@ -1,23 +1,24 @@
 # Rečnik činjenica — UGOVOR između Člana 1 (pravila) i Člana 2 (NLP, CBR)
 #
-# Verzija: 0.2.0
-# Poslednja izmena: posle analize KZ čl. 260-268
+# Verzija: 0.3.0
+# Poslednja izmena: 2026-06-06
 #
-# CHANGE LOG od 0.1.0:
-#   - Dodato: pollutionExtent (manja/veća mera) - kritično za R1
-#   - Dodato: pollutionScope (uži/širi prostor)
-#   - Dodato: ecologicalDamage (uništenje velikih razmera) - za kvalifikovane oblike
-#   - Dodato: damageRemovalDifficulty (duže vreme/veliki troškovi)
-#   - Dodato: perpetratorType (običan učinilac / službeno lice)
-#   - Dodato: substanceDanger (radioaktivna/opasna)
-#   - Dodato: dangerousSubstanceAction (unos/prevoz/prerada/odlaganje/skladištenje)
-#   - Dodato: officialPositionAbuse (zloupotreba službenog položaja)
-#   - Dodato: organizesCrime (organizuje vršenje dela)
-#   - Promenjeno: substanceQuantityM3 je sad samo informativni, ne ulazi u pravila
-#     (jer KZ ne navodi konkretne količine - to je za CBR)
-#   - Dodato: enum SubstanceTarget razdvojen od pollutionTarget
+# CHANGE LOG od 0.2.0:
+#   - pollutionTarget: dodato SUMA kao validnu vrednost, plus alias TLO -> ZEMLJISTE
+#   - substanceType: dodato OPASNE_MATERIJE, DRVO, ZIVOTINJE_RIBE (NLP ekstrahuje)
+#   - ecologicalDamage: alias VELIKA -> VELIKIH_RAZMERA, MALA -> OBICNA (za NLP)
+#   - Novi: damageExtent (sirov NLP izlaz, ne koristi se u pravilima direktno)
+#   - Novi: forestAreaHa (za čl. 274, 275 - pustošenje šuma)
+#   - Novi: articleViolated, sentenceType, sentenceMonths kao "izvedeni metapodaci iz odluke"
+#     (NLP ih ekstrahuje iz POSTOJEĆE presude, NE iz opisa novog slučaja)
+#
+# DOGOVOR SA ČLANOM 2 (NLP):
+#   NLP vraća svoje vrednosti (TLO, VELIKA, MALA, ...). Pravila koriste
+#   kanonske vrednosti (ZEMLJISTE, VELIKIH_RAZMERA, OBICNA, ...).
+#   Mapiranje radi CaseController (cleanFacts metoda) - alias se prevodi
+#   pre nego što činjenice udju u Drools.
 
-version: "0.2.0"
+version: "0.3.0"
 
 predicates:
 
@@ -49,8 +50,12 @@ predicates:
 
   pollutionTarget:
     type: enum
-    values: [VAZDUH, VODA, ZEMLJISTE, VISESTRUKO]
-    description: "Šta je zagadjeno (vazduh/voda/zemljište iz čl. 260 st. 1)"
+    # Kanonske vrednosti koje pravila koriste:
+    values: [VAZDUH, VODA, ZEMLJISTE, VISESTRUKO, SUMA]
+    # NLP aliases - NLP ekstrahuje TLO, pravila ga vide kao ZEMLJISTE:
+    nlp_aliases:
+      TLO: ZEMLJISTE
+    description: "Šta je zagadjeno (vazduh/voda/zemljište/šuma)"
     used_in_rules: [R1]
     cbr_key: true
     cbr_weight: 0.10
@@ -76,6 +81,10 @@ predicates:
   ecologicalDamage:
     type: enum
     values: [NEMA, OBICNA, VELIKIH_RAZMERA]
+    # NLP ekvivalenti - mapiraju se na kanonske vrednosti:
+    nlp_aliases:
+      VELIKA: VELIKIH_RAZMERA
+      MALA: OBICNA
     description: "Uništenje/oštećenje životinjskog ili biljnog sveta"
     used_in_rules: [R3, R4]
     cbr_key: true
@@ -93,41 +102,41 @@ predicates:
     cbr_weight: 0.10
 
   # ============================================================
-  # SUBJEKT KRIVIČNOG DELA (čl. 261, 262 - službeno lice)
+  # SUBJEKT KRIVIČNOG DELA (čl. 261, 262)
   # ============================================================
 
   perpetratorType:
     type: enum
     values: [OBICAN, SLUZBENO_LICE, ODGOVORNO_LICE]
-    description: "Tip učinioca - obični ili službeno/odgovorno lice"
+    description: "Tip učinioca"
     used_in_rules: [R5, R6, R7]
     cbr_key: true
     cbr_weight: 0.10
 
   failedToTakeProtectiveMeasures:
     type: boolean
-    description: "Službeno/odgovorno lice nije preduzelo propisane mere zaštite (čl. 261)"
+    description: "Nije preduzeo propisane mere zaštite (čl. 261)"
     used_in_rules: [R5]
     cbr_key: false
 
   unauthorizedConstruction:
     type: boolean
-    description: "Dozvolio izgradnju/upotrebu objekata koji zagadjuju (čl. 262)"
+    description: "Dozvolio izgradnju zagađujućih objekata (čl. 262)"
     used_in_rules: [R6]
     cbr_key: false
 
   # ============================================================
-  # OŠTEĆENJE OBJEKATA ZAŠTITE (čl. 263)
+  # OSTECENJE OBJEKATA ZASTITE (čl. 263)
   # ============================================================
 
   damagedProtectionEquipment:
     type: boolean
-    description: "Oštetio/uništio objekte ili uređaje za zaštitu životne sredine"
+    description: "Oštetio/uništio objekte za zaštitu životne sredine"
     used_in_rules: [R7]
     cbr_key: false
 
   # ============================================================
-  # ZAŠTIĆENA PRIRODNA DOBRA I VRSTE (čl. 265)
+  # ZASTICENA PRIRODNA DOBRA I VRSTE (čl. 265)
   # ============================================================
 
   destroyedProtectedNaturalAsset:
@@ -138,7 +147,7 @@ predicates:
 
   illegalSpeciesTraffic:
     type: boolean
-    description: "Protivpravno iznošenje/unošenje zaštićene vrste (čl. 265 st. 3)"
+    description: "Protivpravno iznošenje zaštićene vrste (čl. 265 st. 3)"
     used_in_rules: [R9]
     cbr_key: false
 
@@ -148,7 +157,7 @@ predicates:
 
   dangerousSubstanceAction:
     type: boolean
-    description: "Unos/prevoz/prerada/odlaganje/sakupljanje/skladištenje opasnih materija"
+    description: "Unos/prevoz/prerada/odlaganje opasnih materija"
     used_in_rules: [R10, R11]
     cbr_key: false
 
@@ -170,80 +179,130 @@ predicates:
 
   unauthorizedNuclearFacility:
     type: boolean
-    description: "Odobrio/pristupio izgradnji nuklearnog postrojenja bez propisa (čl. 267)"
+    description: "Nedozvoljena izgradnja nuklearnog postrojenja (čl. 267)"
     used_in_rules: [R13]
     cbr_key: false
 
   deniedEnvironmentalInfo:
     type: boolean
-    description: "Uskratio/dao neistinite podatke o stanju životne sredine (čl. 268)"
+    description: "Uskratio podatke o stanju životne sredine (čl. 268)"
     used_in_rules: [R14]
     cbr_key: false
 
   # ============================================================
-  # DODATNE INFORMATIVNE ČINJENICE (za CBR i NLP)
+  # DODATNE CINJENICE (za CBR sličnost, ne za pravila)
   # ============================================================
 
   substanceQuantityM3:
     type: number
     unit: "m^3"
-    description: "Količina ispuštene supstance (informativno, ne ulazi u pravila jer KZ ne specifira pragove)"
-    nlp_patterns:
-      - '\d+(?:[.,]\d+)?\s*(?:m³|m3|kubnih metara|кубних метара)'
+    description: "Količina ispuštene supstance"
     used_in_rules: []
     cbr_key: true
     cbr_weight: 0.10
 
   substanceType:
     type: enum
+    # Kanonske vrednosti + NLP ekstrahovane (sve jednake):
     values:
       - HEMIJSKI_OTPAD
       - RADIOAKTIVNI_OTPAD
       - KOMUNALNI_OTPAD
       - NAFTNI_DERIVATI
+      - OPASNE_MATERIJE        # NLP - generička kategorija (otrov, kiselina)
+      - DRVO                   # NLP - šumske krađe (čl. 274, 275)
+      - ZIVOTINJE_RIBE         # NLP - lov i ribolov (čl. 276, 277)
       - OSTALO
-    description: "Tip ispuštene supstance (informativno + za CBR sličnost)"
+    description: "Tip supstance ili predmeta krivičnog dela"
     used_in_rules: []
     cbr_key: true
     cbr_weight: 0.05
     similarity:
       type: taxonomy
       hierarchy:
-        OPASAN: [HEMIJSKI_OTPAD, RADIOAKTIVNI_OTPAD, NAFTNI_DERIVATI]
+        OPASAN: [HEMIJSKI_OTPAD, RADIOAKTIVNI_OTPAD, NAFTNI_DERIVATI, OPASNE_MATERIJE]
+        PRIRODNI: [DRVO, ZIVOTINJE_RIBE]
         BENIGN: [KOMUNALNI_OTPAD, OSTALO]
+
+  damageExtent:
+    type: enum
+    values: [MALA, VELIKA]
+    description: "Sirov obim štete iz NLP ekstrakcije. Pravila ne koriste direktno - ide kroz mapiranje u ecologicalDamage."
+    used_in_rules: []
+    cbr_key: true
+    cbr_weight: 0.10
+    similarity:
+      type: ordinal
+      order: [MALA, VELIKA]
+
+  forestAreaHa:
+    type: number
+    unit: "ha"
+    description: "Površina pustošene šume (čl. 274, 275) - informativno"
+    used_in_rules: []
+    cbr_key: true
+    cbr_weight: 0.10
 
   priorConviction:
     type: boolean
-    description: "Prethodna osuda za isto/slično delo (otežavajuća okolnost)"
+    description: "Prethodno osuđivan (otežavajuća okolnost)"
     used_in_rules: []
     cbr_key: true
     cbr_weight: 0.05
 
   remediedDamage:
     type: boolean
-    description: "Učinilac otklonio štetu pre suđenja (olakšavajuća okolnost)"
+    description: "Otklonio štetu pre suđenja (olakšavajuća okolnost)"
     used_in_rules: []
     cbr_key: true
     cbr_weight: 0.05
 
   # ============================================================
-  # IZVEDENI PREDIKATI (ne ekstrahuje NLP - izvode pravila)
+  # IZVEDENI METAPODACI IZ ODLUKE (NLP iz već donesene presude)
+  # ============================================================
+  # NLP ekstrahuje iz POSTOJEĆE presude, ne iz opisa novog slučaja.
+  # Koriste se za CBR (poređenje sa prethodnim odlukama), NE ulaze u pravila.
+
+  articleViolated:
+    type: string
+    description: "eId prekršenog člana (NLP iz presude). Ishod, ne ulaz."
+    used_in_rules: []
+    cbr_key: false
+    output_only: true
+
+  sentenceType:
+    type: enum
+    values: [ZATVOR, NOVCANA, USLOVNA, RAD_U_JAVNOM_INTERESU]
+    description: "Vrsta izrečene kazne (NLP iz presude). Ishod."
+    used_in_rules: []
+    cbr_key: false
+    output_only: true
+
+  sentenceMonths:
+    type: number
+    description: "Trajanje kazne u mesecima (NLP iz presude). Ishod."
+    used_in_rules: []
+    cbr_key: false
+    output_only: true
+
+  # ============================================================
+  # IZVEDENI PREDIKATI (rezultat pravila)
   # ============================================================
 
   violates:
     type: relation
     arity: 2
-    description: "Lice X krši član Y (npr. art_260__para_1)"
+    description: "Lice X krši član Y"
     derived: true
 
   sentenceRange:
     type: relation
     arity: 3
-    description: "Predloženi raspon kazne (od, do) u mesecima za lice X"
+    description: "Predloženi raspon kazne"
     derived: true
 
   applicableArticle:
     type: relation
     arity: 2
-    description: "Identifikovani primenljiv član za slučaj"
+    description: "Identifikovani primenljiv član"
     derived: true

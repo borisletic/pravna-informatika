@@ -29,17 +29,28 @@ public class CaseController {
     private final CaseReasoner caseReasoner;
 
     /**
-     * Forma za unos novog slučaja (Celina 8).
+     * NLP alias -> kanonske vrednosti.
+     * NLP (Član 2) vraća svoje vrednosti, pravila (Član 1) koriste kanonske.
+     * Mapiranje se radi ovde, pre nego što činjenice udju u Drools.
+     *
+     * Sinkronizovano sa predicate_dictionary.yaml v0.3.0, sekcija nlp_aliases.
      */
+    private static final Map<String, Map<String, String>> NLP_ALIASES = Map.of(
+            "pollutionTarget", Map.of(
+                    "TLO", "ZEMLJISTE"
+            ),
+            "ecologicalDamage", Map.of(
+                    "VELIKA", "VELIKIH_RAZMERA",
+                    "MALA", "OBICNA"
+            )
+    );
+
     @GetMapping("/new")
     public String newCaseForm(Model model) {
         model.addAttribute("facts", new CaseFacts());
         return "cases/new";
     }
 
-    /**
-     * Submit slučaja - pokreće oba reasoner-a.
-     */
     @PostMapping("/reason")
     public String reason(@ModelAttribute CaseFacts facts, Model model) {
         CaseFacts cleaned = cleanFacts(facts);
@@ -50,12 +61,6 @@ public class CaseController {
         return "cases/result";
     }
 
-    /**
-     * Konačna potvrda korisnika - retain u CBR bazu + PostgreSQL.
-     *
-     * VLASNIK: Član 3 (Celina 8). Trenutno - inicijalna implementacija
-     * koja čuva u PostgreSQL preko JPA i poziva CaseReasoner.retain().
-     */
     @PostMapping("/save")
     public String save(@ModelAttribute CaseFacts facts,
                        @RequestParam String articleViolated,
@@ -64,17 +69,15 @@ public class CaseController {
                        RedirectAttributes redirectAttrs) {
 
         CaseFacts cleaned = cleanFacts(facts);
-        log.info("Save case: article={}, sentence={} {}m, facts={}",
-                articleViolated, sentenceType, sentenceMonths, cleaned.getFacts());
+        log.info("Save case: article={}, sentence={} {}m",
+                articleViolated, sentenceType, sentenceMonths);
 
         try {
-            // 1. PostgreSQL preko JPA
             CaseEntity entity = caseEntityMapper.toEntity(
                     cleaned, articleViolated, sentenceType, sentenceMonths);
             CaseEntity saved = caseRepository.save(entity);
             log.info("Slučaj sačuvan u PostgreSQL: id={}", saved.getId());
 
-            // 2. CBR retain (CSV) - Član 2 implementira pravu logiku
             SentenceProposal sentenceProposal = buildSentenceProposal(sentenceType, sentenceMonths);
             caseReasoner.retain(cleaned, articleViolated, sentenceProposal);
 
@@ -90,19 +93,11 @@ public class CaseController {
         }
     }
 
-    /**
-     * Lista sačuvanih slučajeva.
-     * TODO Član 3: napraviti templejt cases/list.html
-     */
     @GetMapping
     public String list(Model model) {
         model.addAttribute("cases", caseRepository.findAll());
         return "cases/list";
     }
-
-    // ============================================================
-    // helperi
-    // ============================================================
 
     private SentenceProposal buildSentenceProposal(String sentenceType, Integer months) {
         if (sentenceType == null || sentenceType.isBlank()) return null;
@@ -117,11 +112,11 @@ public class CaseController {
     }
 
     /**
-     * Čisti činjenice iz forme:
-     *  - prazni stringovi se brišu
-     *  - "true"/"false" se konvertuje u Boolean (checkbox-i)
-     *  - brojevi u Double
-     *  - enum vrednosti ostaju kao stringovi
+     * Čisti i normalizuje činjenice iz forme/NLP-a:
+     *  1. uklanja prazne stringove
+     *  2. konvertuje "true"/"false" stringove u Boolean (checkbox-i)
+     *  3. brojeve u Double
+     *  4. PREVODI NLP ALIAS-E u kanonske vrednosti
      */
     private CaseFacts cleanFacts(CaseFacts input) {
         Map<String, Object> cleaned = new HashMap<>();
@@ -132,21 +127,36 @@ public class CaseController {
         }
 
         for (Map.Entry<String, Object> entry : input.getFacts().entrySet()) {
+            String predicate = entry.getKey();
             Object value = entry.getValue();
             if (value == null) continue;
             String str = value.toString().trim();
             if (str.isEmpty()) continue;
 
+            // 1. Boolean
             if ("true".equalsIgnoreCase(str)) {
-                cleaned.put(entry.getKey(), Boolean.TRUE);
-            } else if ("false".equalsIgnoreCase(str)) {
-                cleaned.put(entry.getKey(), Boolean.FALSE);
-            } else {
-                try {
-                    cleaned.put(entry.getKey(), Double.parseDouble(str));
-                } catch (NumberFormatException e) {
-                    cleaned.put(entry.getKey(), str);
-                }
+                cleaned.put(predicate, Boolean.TRUE);
+                continue;
+            }
+            if ("false".equalsIgnoreCase(str)) {
+                cleaned.put(predicate, Boolean.FALSE);
+                continue;
+            }
+
+            // 2. NLP alias mapiranje
+            Map<String, String> aliases = NLP_ALIASES.get(predicate);
+            if (aliases != null && aliases.containsKey(str)) {
+                String canonical = aliases.get(str);
+                log.debug("NLP alias: {}.{} -> {}", predicate, str, canonical);
+                cleaned.put(predicate, canonical);
+                continue;
+            }
+
+            // 3. Broj?
+            try {
+                cleaned.put(predicate, Double.parseDouble(str));
+            } catch (NumberFormatException e) {
+                cleaned.put(predicate, str);
             }
         }
         CaseFacts result = new CaseFacts();
