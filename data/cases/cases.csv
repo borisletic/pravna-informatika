@@ -1,2 +1,4 @@
 id,source,sourceJudgmentId,substanceQuantityM3,substanceType,pollutionTarget,damageExtent,intent,priorConviction,remediedDamage,forestAreaHa,articleViolated,sentenceType,sentenceMonths
 "1","USER","","","","VODA","","UMISLJAJ","","","","art_260__para_3","ZATVOR","24"
+"1","USER","","","","VODA","","UMISLJAJ","","","","art_266__para_2","ZATVOR","54"
+"1","USER","","","","VAZDUH","","UMISLJAJ","","","","art_266__para_5","ZATVOR","78"
