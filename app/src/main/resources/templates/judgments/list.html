@@ -12,17 +12,39 @@
 </nav>
 <main class="container mt-4">
     <h1>Sudske odluke</h1>
+    <p class="text-muted">Ukupno učitano: <span th:text="${#lists.size(judgments)}">0</span> odluka</p>
+
     <div th:if="${#lists.isEmpty(judgments)}" class="alert alert-info">
         Nema učitanih odluka. Stavi Akoma Ntoso XML fajl u <code>data/judgments/</code>.
     </div>
-    <table class="table table-striped">
-        <thead><tr><th>Broj predmeta</th><th>Sud</th><th>Datum</th><th></th></tr></thead>
+
+    <table th:unless="${#lists.isEmpty(judgments)}" class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Broj predmeta</th>
+                <th>Sud</th>
+                <th>Datum</th>
+                <th>Pomenuti članovi</th>
+                <th></th>
+            </tr>
+        </thead>
         <tbody>
             <tr th:each="j : ${judgments}">
-                <td th:text="${j.caseNumber}">K-145/2019</td>
-                <td th:text="${j.court}">Viši sud</td>
-                <td th:text="${j.date}">2019-04-12</td>
-                <td><a th:href="@{'/judgments/' + ${j.id}}" class="btn btn-sm btn-outline-primary">Otvori</a></td>
+                <td th:text="${j.caseNumber} ?: '-'">K. 145/2019</td>
+                <td th:text="${j.court} ?: '(nepoznat sud)'">Viši sud</td>
+                <td th:text="${j.date != null ? #temporals.format(j.date, 'dd.MM.yyyy.') : '-'}">12.04.2019.</td>
+                <td>
+                    <span th:if="${#lists.isEmpty(j.referencedArticles)}" class="text-muted">-</span>
+                    <span th:unless="${#lists.isEmpty(j.referencedArticles)}">
+                        <span th:each="art, iter : ${j.referencedArticles}"
+                              class="badge bg-secondary me-1"
+                              th:text="${#strings.replace(art, 'art_', 'čl. ')}">čl. 260</span>
+                    </span>
+                </td>
+                <td>
+                    <a th:href="@{'/judgments/' + ${j.id}}"
+                       class="btn btn-sm btn-outline-primary">Otvori</a>
+                </td>
             </tr>
         </tbody>
     </table>
