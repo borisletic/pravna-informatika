@@ -39,7 +39,7 @@ server:
 # NAPOMENA: ne koristimo ${user.dir} jer zavisi od toga gde se pokreće aplikacija
 # (iz IntelliJ root-a, iz app/, iz mvn spring-boot:run u app/, itd).
 app:
-  data-dir: ${DATA_DIR:./data}
+  data-dir: ${DATA_DIR:../data}
   nlp:
     base-url: http://localhost:8000
     timeout-seconds: 30
