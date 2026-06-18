@@ -15,6 +15,7 @@
         <div class="navbar-nav">
             <a class="nav-link" th:href="@{/laws}">Zakoni</a>
             <a class="nav-link" th:href="@{/judgments}">Sudske odluke</a>
+            <a class="nav-link" th:href="@{/cases}">Sačuvani slučajevi</a>
             <a class="nav-link" th:href="@{/cases/new}">Novi slučaj</a>
         </div>
     </div>
@@ -26,7 +27,7 @@
     <p>Krivična dela protiv životne sredine (KZ čl. 260–268).</p>
 
     <div class="row mt-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card">
                 <div class="card-body">
                     <h5>Pregled zakona</h5>
@@ -35,7 +36,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card">
                 <div class="card-body">
                     <h5>Sudske odluke</h5>
@@ -44,7 +45,16 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Sačuvani slučajevi</h5>
+                    <p>Pregledajte ranije sačuvane slučajeve i rezultate rasuđivanja.</p>
+                    <a th:href="@{/cases}" class="btn btn-primary">Otvori</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="card">
                 <div class="card-body">
                     <h5>Novi slučaj</h5>
