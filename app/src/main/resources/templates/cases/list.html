@@ -44,6 +44,7 @@
                 <th>Cilj zagađenja</th>
                 <th>Šteta</th>
                 <th>Datum</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -57,6 +58,11 @@
                 <td th:text="${c.pollutionTarget} ?: '-'">VODA</td>
                 <td th:text="${c.damageExtent} ?: '-'">TESKA</td>
                 <td th:text="${#temporals.format(c.createdAt, 'dd.MM.yyyy. HH:mm')}">01.10.2025.</td>
+                <td>
+                    <a th:href="@{'/cases/' + ${c.id} + '/generate'}"
+                       class="btn btn-sm btn-outline-dark"
+                       onclick="return confirm('Generisati odluku za ovaj slučaj?')">Generiši odluku</a>
+                </td>
             </tr>
         </tbody>
     </table>

@@ -208,4 +208,42 @@ public class CaseController {
         return "redirect:/judgments/" + id;
     }
 
+    @GetMapping("/{id}/generate")
+    public String generateFromCase(@PathVariable Long id,
+                                   RedirectAttributes redirectAttrs) {
+        try {
+            CaseEntity entity = caseRepository.findById(id).orElseThrow();
+
+            CaseFacts facts = new CaseFacts();
+            if (entity.getFactsJson() != null && !entity.getFactsJson().isBlank()) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper =
+                        new com.fasterxml.jackson.databind.ObjectMapper();
+                java.util.Map<String, Object> factsMap = mapper.readValue(
+                        entity.getFactsJson(),
+                        new com.fasterxml.jackson.core.type.TypeReference<>(){});
+                facts.setFacts(factsMap);
+            }
+            facts.setDescription(entity.getDescription());
+
+            ReasoningService.CombinedResult result = reasoningService.reasonAll(facts);
+            SentenceProposal proposal = buildSentenceProposal(
+                    entity.getSentenceType() != null ? entity.getSentenceType().name() : null,
+                    entity.getSentenceMonths());
+
+            String xml = decisionGenerator.generate(facts, result.getRuleBasedResult(), proposal);
+
+            String genId = "generated-" + System.currentTimeMillis();
+            java.nio.file.Path dir = java.nio.file.Paths.get(
+                    appConfig.getDataDir(), "judgments", "generated");
+            java.nio.file.Files.createDirectories(dir);
+            java.nio.file.Files.writeString(dir.resolve(genId + ".xml"), xml);
+
+            return "redirect:/judgments/" + genId;
+        } catch (Exception e) {
+            log.error("Greška pri generisanju odluke iz slučaja: {}", e.getMessage());
+            redirectAttrs.addFlashAttribute("error", "Greška pri generisanju odluke.");
+            return "redirect:/cases";
+        }
+    }
+
 }
