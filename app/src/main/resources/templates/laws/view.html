@@ -15,7 +15,7 @@
 </nav>
 <main class="container mt-4">
     <a th:href="@{/laws}" class="btn btn-sm btn-outline-secondary">&larr; Svi zakoni</a>
-    <h1 class="mt-3" th:text="'Zakon: ' + ${lawId}">Zakon</h1>
+    <h1 class="mt-3" th:text="'Krivični zakonik'">Zakon</h1>
     <div class="law-content mt-4" th:utext="${lawHtml}">
         <!-- HTML iz XSLT transformacije -->
     </div>
