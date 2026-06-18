@@ -5,6 +5,7 @@
     <title>Zakoni</title>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
 </head>
 <body>
 <nav class="navbar navbar-dark bg-dark">
@@ -14,14 +15,33 @@
 </nav>
 <main class="container mt-4">
     <h1>Zakoni</h1>
+    <p class="text-muted">Ukupno učitano: <span th:text="${#lists.size(laws)}">0</span> zakona</p>
+
     <div th:if="${#lists.isEmpty(laws)}" class="alert alert-info">
         Nema učitanih zakona. Stavi Akoma Ntoso XML fajl u <code>data/laws/</code>.
     </div>
-    <ul class="list-group">
-        <li class="list-group-item" th:each="law : ${laws}">
-            <a th:href="@{'/laws/' + ${law.id}}" th:text="${law.title}">Naziv zakona</a>
-        </li>
-    </ul>
+
+    <table th:unless="${#lists.isEmpty(laws)}" class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th>Naziv</th>
+            <th>Datum usvajanja</th>
+            <th>Broj članova</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="law : ${laws}">
+            <td th:text="${law.title}">Naziv zakona</td>
+            <td th:text="${law.enactedDate != null ? #temporals.format(law.enactedDate, 'dd.MM.yyyy.') : '-'}">-</td>
+            <td th:text="${#lists.size(law.articles)}">0</td>
+            <td>
+                <a th:href="@{'/laws/' + ${law.id}}"
+                   class="btn btn-sm btn-outline-primary">Otvori</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </main>
 </body>
 </html>
