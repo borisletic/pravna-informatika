@@ -21,6 +21,10 @@
                       placeholder="npr. Osumnjičeni je 15.3. ispustio oko 12 m³ hemijskog otpada u reku..."></textarea>
             <div class="form-text">NLP će kasnije pokušati da ekstrahuje činjenice iz teksta (Celina 4).</div>
         </div>
+        <button type="button" class="btn btn-secondary mt-2" onclick="nlpPopuni()">
+            Popuni automatski iz teksta
+        </button>
+        <div id="nlp-status" class="form-text" style="display:none;color:green;">Učitavanje...</div>
 
         <hr/>
 
@@ -244,5 +248,33 @@
         <button class="btn btn-primary mt-4 mb-5" type="submit">Pokreni rasuđivanje</button>
     </form>
 </main>
+    <script>
+        function nlpPopuni() {
+            const opis = document.querySelector('[name="description"]').value;
+            if (!opis.trim()) { alert("Unesite opis slučaja prvo."); return; }
+
+            document.getElementById('nlp-status').style.display = 'block';
+
+            fetch('/cases/nlp-extract', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'description=' + encodeURIComponent(opis)
+            })
+                .then(r => r.json())
+                .then(facts => {
+                    for (const [key, value] of Object.entries(facts)) {
+                        const el = document.querySelector(`[name="facts[${key}]"]`);
+                        if (!el) continue;
+                        if (el.type === 'checkbox') el.checked = value === true || value === 'true';
+                        else el.value = value;
+                    }
+                    document.getElementById('nlp-status').textContent = 'Činjenice popunjene!';
+                })
+                .catch(() => {
+                    document.getElementById('nlp-status').textContent = 'NLP nije dostupan.';
+                    document.getElementById('nlp-status').style.color = 'red';
+                });
+        }
+    </script>
 </body>
 </html>

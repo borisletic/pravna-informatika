@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import rs.ftn.pi.config.AppConfig;
+import rs.ftn.pi.generation.DecisionGenerator;
 import rs.ftn.pi.model.CaseEntity;
 import rs.ftn.pi.model.CaseFacts;
 import rs.ftn.pi.reasoning.cbr.CaseReasoner;
@@ -27,6 +29,9 @@ public class CaseController {
     private final CaseRepository caseRepository;
     private final CaseEntityMapper caseEntityMapper;
     private final CaseReasoner caseReasoner;
+
+    private final DecisionGenerator decisionGenerator;
+    private final AppConfig appConfig;
 
     /**
      * NLP alias -> kanonske vrednosti.
@@ -164,4 +169,43 @@ public class CaseController {
         result.setDescription(input.getDescription());
         return result;
     }
+
+    @PostMapping("/nlp-extract")
+    @ResponseBody
+    public Map<String, Object> nlpExtract(@RequestParam String description) {
+        try {
+            CaseFacts extracted = reasoningService.extractFromText(description);
+            return extracted.getFacts() != null ? extracted.getFacts() : Map.of();
+        } catch (Exception e) {
+            log.error("NLP greška: {}", e.getMessage());
+            return Map.of();
+        }
+    }
+
+    @PostMapping("/generate")
+    public String generate(@ModelAttribute CaseFacts facts,
+                           @RequestParam String articleViolated,
+                           @RequestParam String sentenceType,
+                           @RequestParam(required = false) Integer sentenceMonths,
+                           Model model) {
+        CaseFacts cleaned = cleanFacts(facts);
+        ReasoningService.CombinedResult result = reasoningService.reasonAll(cleaned);
+
+        SentenceProposal proposal = buildSentenceProposal(sentenceType, sentenceMonths);
+        String xml = decisionGenerator.generate(cleaned, result.getRuleBasedResult(), proposal);
+
+        // Sačuvaj fajl
+        String id = "generated-" + System.currentTimeMillis();
+        try {
+            java.nio.file.Path dir = java.nio.file.Paths.get(appConfig.getDataDir(), "judgments", "generated");
+            java.nio.file.Files.createDirectories(dir);
+            java.nio.file.Files.writeString(dir.resolve(id + ".xml"), xml);
+            log.info("Odluka sačuvana: {}", id);
+        } catch (Exception e) {
+            log.error("Greška pri čuvanju odluke: {}", e.getMessage());
+        }
+
+        return "redirect:/judgments/" + id;
+    }
+
 }

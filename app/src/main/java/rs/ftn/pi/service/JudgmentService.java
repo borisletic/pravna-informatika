@@ -40,11 +40,23 @@ public class JudgmentService {
         } catch (Exception e) {
             log.error("Greška pri listanju odluka", e);
         }
+        Path generatedDir = judgmentsDir.resolve("generated");
+        if (Files.exists(generatedDir)) {
+            try (Stream<Path> files = Files.list(generatedDir)) {
+                files.filter(p -> p.toString().endsWith(".xml"))
+                        .forEach(p -> result.add(parser.parseJudgment(p)));
+            } catch (Exception e) {
+                log.error("Greška pri listanju generisanih odluka", e);
+            }
+        }
         return result;
     }
 
     public Optional<String> getJudgmentHtml(String judgmentId) {
         Path xmlPath = Paths.get(appConfig.getDataDir(), "judgments", judgmentId + ".xml");
+        if (!Files.exists(xmlPath)) {
+            xmlPath = Paths.get(appConfig.getDataDir(), "judgments", "generated", judgmentId + ".xml");
+        }
         if (!Files.exists(xmlPath)) {
             return Optional.empty();
         }

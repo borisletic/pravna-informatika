@@ -146,6 +146,22 @@
                         </div>
                         <button type="submit" class="btn btn-warning w-100">Sačuvaj slučaj</button>
                     </form>
+
+                    <form th:action="@{/cases/generate}" method="post" class="mt-2">
+                        <input type="hidden" th:each="entry : ${facts.facts}"
+                               th:name="'facts[' + ${entry.key} + ']'"
+                               th:value="${entry.value}"/>
+                        <input type="hidden" name="articleViolated"
+                               th:value="${not #lists.isEmpty(result.ruleBasedResult.violatedArticles)
+                                          ? result.ruleBasedResult.violatedArticles[0].articleEId : ''}"/>
+                        <input type="hidden" name="sentenceType"
+                               th:value="${result.ruleBasedResult.sentenceProposal != null
+                                          ? result.ruleBasedResult.sentenceProposal.type : 'ZATVOR'}"/>
+                        <input type="hidden" name="sentenceMonths"
+                               th:value="${result.ruleBasedResult.sentenceProposal != null
+                                          ? result.ruleBasedResult.sentenceProposal.proposedMonths : ''}"/>
+                        <button type="submit" class="btn btn-outline-dark w-100">Generiši odluku</button>
+                    </form>
                 </div>
             </div>
         </div>

@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-    XSLT: Akoma Ntoso sudska odluka -> HTML
-    VLASNIK: Član 3, uz konsultaciju Člana 2 (zna strukturu anotacije odluka)
-    CELINA: 7
-
-    TODO: razraditi za sve elemente koji se anotiraju u Celini 2.
--->
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
@@ -14,44 +7,66 @@
     <xsl:output method="html" indent="yes"/>
 
     <xsl:template match="/">
-        <div class="judgment">
+        <div class="judgment-content">
             <header class="judgment-header">
-                <h2>
+                <div class="judgment-meta">
                     <span class="case-num">
-                        <xsl:value-of select="//akn:identification//akn:FRBRalias[@name='caseNumber']/@value"/>
+                        <xsl:value-of select="//akn:FRBRalias[@name='caseNumber']/@value"/>
                     </span>
-                </h2>
-                <p class="court">
-                    <xsl:value-of select="//akn:identification//akn:FRBRauthor/@href"/>
-                </p>
+                    <span class="court">
+                        <xsl:value-of select="//akn:FRBRalias[@name='court']/@value"/>
+                    </span>
+                    <span class="judgment-date">
+                        <xsl:value-of select="//akn:FRBRdate[@name='judgment']/@date"/>
+                    </span>
+                </div>
             </header>
             <xsl:apply-templates select="//akn:judgmentBody"/>
         </div>
     </xsl:template>
 
     <xsl:template match="akn:background">
-        <section class="background">
-            <h3>Činjenično stanje</h3>
-            <xsl:apply-templates/>
+        <section class="judgment-section">
+            <h3 class="section-title">Činjenično stanje</h3>
+            <div class="section-body">
+                <xsl:apply-templates/>
+            </div>
         </section>
     </xsl:template>
 
     <xsl:template match="akn:motivation">
-        <section class="motivation">
-            <h3>Obrazloženje</h3>
-            <xsl:apply-templates/>
+        <section class="judgment-section">
+            <h3 class="section-title">Obrazloženje</h3>
+            <div class="section-body">
+                <xsl:apply-templates/>
+            </div>
         </section>
     </xsl:template>
 
     <xsl:template match="akn:decision">
-        <section class="decision">
-            <h3>Dispozitiv</h3>
-            <xsl:apply-templates/>
+        <section class="judgment-section decision-section">
+            <h3 class="section-title">Dispozitiv</h3>
+            <div class="section-body">
+                <xsl:apply-templates/>
+            </div>
         </section>
     </xsl:template>
 
+    <xsl:template match="akn:introduction">
+        <section class="judgment-section">
+            <h3 class="section-title">Uvod</h3>
+            <div class="section-body">
+                <xsl:apply-templates/>
+            </div>
+        </section>
+    </xsl:template>
+
+    <xsl:template match="akn:p">
+        <p><xsl:apply-templates/></p>
+    </xsl:template>
+
     <xsl:template match="akn:ref">
-        <a class="ref" href="{@href}">
+        <a class="ref judgment-ref" href="{@href}">
             <xsl:value-of select="."/>
         </a>
     </xsl:template>

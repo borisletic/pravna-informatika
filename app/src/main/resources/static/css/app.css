@@ -1,59 +1,236 @@
-/* Pravna informatika - osnovni stilovi */
-
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Cinzel:wght@400;600;700&display=swap');
+.law-wrap{background:#fdfcf8;padding:2.5rem 3.5rem;font-family:'EB Garamond',Georgia,serif;font-size:17px;line-height:1.85;color:#1a1a1a;border:1px solid #ccc8bb;}
+.ch-header{text-align:center;padding-bottom:1.5rem;margin-bottom:2rem;}
+.ch-label{display:block;font-family:'Cinzel',serif;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.18em;color:#8a7a5a;margin-bottom:0.3rem;}
+.ch-title{font-family:'Cinzel',serif;font-size:1.15rem;font-weight:700;color:#1F3864;margin:0 0 0.75rem;}
+.ch-rule{border:none;height:1px;background:linear-gradient(to right,transparent,#c8b882,#8a7a5a,#c8b882,transparent);margin:0;}
+.article{margin-bottom:2rem;padding-bottom:1.5rem;}
+.article-sep{text-align:center;color:#c8b882;font-size:0.9rem;letter-spacing:0.5em;margin:1.5rem 0;}
+.art-header{padding-left:1.25rem;border-left:3px solid #c8b882;margin-bottom:0.75rem;}
+.art-num{display:block;font-family:'Cinzel',serif;font-weight:700;font-size:0.95rem;color:#b8922a;letter-spacing:0.05em;}
+.art-title{display:block;font-style:italic;color:#444;font-size:0.95rem;}
+.art-body{padding-left:1.25rem;}
+.para{display:flex;gap:1rem;margin-bottom:0.7rem;align-items:flex-start;}
+.para-num{flex-shrink:0;font-weight:600;color:#8a7a5a;font-size:0.88rem;min-width:2rem;text-align:center;padding-top:0.15rem;}
+.para p{margin:0;text-align:justify;}
+.ref{color:#1a56a0;text-decoration:none;border-bottom:1px dotted #1a56a0;}
 body {
-    font-family: 'Times New Roman', Georgia, serif;
+    font-family: 'EB Garamond', Georgia, serif;
+    background: #f0ede6;
+    color: #1a1a1a;
+    font-size: 17px;
 }
 
-.law-content, .judgment-content {
-    background: #fff;
-    padding: 2rem;
-    border: 1px solid #dee2e6;
-    border-radius: .25rem;
-    line-height: 1.7;
+.law-content {
+    background: #fdfcf8;
+    padding: 3rem 5rem;
+    max-width: 900px;
+    margin: 0 auto;
+    border: 1px solid #ccc8bb;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    line-height: 1.85;
 }
 
-/* Anotacije unutar XSLT izlaza */
-.law-content .ref,
-.judgment-content .ref {
-    color: #0d6efd;
-    text-decoration: none;
-    border-bottom: 1px dotted #0d6efd;
-    cursor: pointer;
+.chapter { margin-bottom: 3rem; }
+
+.chapter-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem 0 1rem;
 }
 
-.law-content .article {
-    margin-bottom: 1.5rem;
+.chapter-header::after {
+    content: '';
+    display: block;
+    margin: 0.75rem auto 0;
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #c8b882, #8a7a5a, #c8b882, transparent);
 }
 
-.law-content .article-num,
-.judgment-content .case-num {
-    font-weight: bold;
+.chapter-label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #8a7a5a;
+    margin-bottom: 0.4rem;
+}
+
+.chapter-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
     color: #1F3864;
+    margin: 0 0 1rem;
 }
 
-.law-content .article-heading {
+.article {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    position: relative;
+}
+
+.article + .article::before {
+    content: '§';
+    display: block;
+    text-align: center;
+    color: #c8b882;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    letter-spacing: 0.5em;
+}
+
+.article:target {
+    background: #fffbe6;
+    padding: 1rem 1.25rem;
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px #c8b882;
+}
+
+.article-header {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    border-left: 3px solid #c8b882;
+}
+
+.article-num {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #b8922a;
+    letter-spacing: 0.05em;
+}
+
+.article-title {
+    display: block;
     font-style: italic;
-    margin-bottom: .5rem;
+    color: #333;
+    font-size: 1rem;
 }
 
-/* Highlight kada se skroluje na referencu */
-.law-content .article:target {
-    background: #fff3cd;
-    padding: 1rem;
-    border-radius: .25rem;
-    transition: background 1s ease;
+.article-body { padding-left: 1.5rem; }
+
+.paragraph {
+    margin-bottom: 0.9rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
 }
 
-/* Ekstrahovane činjenice u prikazu odluke */
+.para-num {
+    flex-shrink: 0;
+    font-weight: 600;
+    color: #8a7a5a;
+    font-size: 0.9rem;
+    min-width: 2.2rem;
+    text-align: center;
+    padding-top: 0.1rem;
+}
+
+.paragraph p {
+    margin: 0;
+    text-align: justify;
+    hyphens: auto;
+}
+
+.judgment-content {
+    background: #fdfcf8;
+    padding: 3rem 5rem;
+    max-width: 900px;
+    margin: 0 auto;
+    border: 1px solid #ccc8bb;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    line-height: 1.85;
+}
+
+.judgment-header {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.judgment-header::after {
+    content: '';
+    display: block;
+    margin: 1rem auto 0;
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #c8b882, #8a7a5a, #c8b882, transparent);
+}
+
+.judgment-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.case-num {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1F3864;
+    letter-spacing: 0.05em;
+}
+
+.court { font-size: 1rem; color: #444; font-style: italic; }
+.judgment-date { font-size: 0.9rem; color: #8a7a5a; }
+
+.judgment-section { margin-bottom: 2rem; }
+
+.section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #8a7a5a;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #e0ddd4;
+}
+
+.section-body p {
+    margin-bottom: 0.75rem;
+    text-align: justify;
+    hyphens: auto;
+}
+
+.decision-section .section-body {
+    background: #f5f2ea;
+    border-left: 3px solid #b8922a;
+    padding: 1rem 1.25rem;
+    border-radius: 0 4px 4px 0;
+}
+
+.ref {
+    color: #1a56a0;
+    text-decoration: none;
+    border-bottom: 1px dotted #1a56a0;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.ref:hover {
+    color: #b8922a;
+    border-bottom-color: #b8922a;
+    border-bottom-style: solid;
+}
+
 .extracted-fact {
     background: #e7f3ff;
-    border-left: 3px solid #0d6efd;
-    padding: 4px 8px;
-    margin: 4px 0;
-    font-size: .9rem;
+    border-left: 3px solid #1a56a0;
+    padding: 6px 10px;
+    margin: 6px 0;
+    font-size: 0.9rem;
+    border-radius: 0 4px 4px 0;
 }
 
 .extracted-fact .confidence {
-    font-size: .8rem;
+    font-size: 0.8rem;
     color: #6c757d;
 }
