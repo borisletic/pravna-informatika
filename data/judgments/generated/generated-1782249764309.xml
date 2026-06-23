@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+  <judgment name="presuda">
+    <meta>
+      <identification source="#sistem">
+        <FRBRWork>
+          <FRBRthis value="/akn/rs/judgment/pi/0c1e8f41/main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/0c1e8f41"/>
+          <FRBRalias name="caseNumber" value="PI-0C1E8F41"/>
+          <FRBRalias name="court" value="Sistem za podrsku odlucivanju"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRcountry value="rs"/>
+        </FRBRWork>
+        <FRBRExpression>
+          <FRBRthis value="/akn/rs/judgment/pi/0c1e8f41/srp@/main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/0c1e8f41/srp@"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRlanguage language="srp"/>
+        </FRBRExpression>
+        <FRBRManifestation>
+          <FRBRthis value="/akn/rs/judgment/pi/0c1e8f41/srp@/main.xml"/>
+          <FRBRuri value="/akn/rs/judgment/pi/0c1e8f41/srp@.xml"/>
+          <FRBRdate date="2026-06-23" name="generation"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRformat value="application/xml"/>
+        </FRBRManifestation>
+      </identification>
+      <references source="#sistem">
+        <TLCOrganization eId="sistem" href="/akn/ontology/organization/rs/pi-sistem" showAs="Sistem za podrsku odlucivanju"/>
+        <TLCReference eId="kz" href="/akn/rs/act/2005/kz" showAs="Krivicni zakonik"/>
+      </references>
+    </meta>
+    <judgmentBody>
+      <introduction>
+        <p>Predmet broj PI-0C1E8F41 od dana 23.06.2026..</p>
+        <p>Postupak je pokrenut na osnovu utvrđenog činjeničnog stanja.</p>
+      </introduction>
+      <background>
+        <p>Utvrđeno je da je okrivljeni zagadio hranu odnosno vodu za ishranu i napajanje životinja, nije preduzeo propisane mere zaštite, kršio propise o zaštiti životne sredine, zagađenje je nastalo na širem prostoru, učinilac je postupao u svojstvu odgovornog lica, zagađenje je izvršeno u većoj meri, otklanjanje štete zahteva duže vreme i velike troškove.</p>
+      </background>
+      <decision>
+        <p>Okrivljeni se oglasava krivim jer je prekrsio <ref href="/laws/kz#art_261">KZ čl. 261 st. 1</ref>.</p>
+        <p>Izrice se: <b>kazna zatvora u trajanju od 33 meseci</b></p>
+      </decision>
+      <motivation>
+        <p>Obrazloženje Presude:</p>
+        <p>Na temelju utvrđenih činjenica, okrivljeni je počinio zagađenje životne sredine, kršavši propise o zaštiti životne sredine (KZ čl. 261 st. 1). Okrivljeni nije preduzeo propisane mere zaštite, a zagađenje je nastalo na širem prostoru. Ovakav počinak se smatra težim jer otklanjanje štete zahteva duže vreme i velike troškove.</p>
+        <p>U sličnim ranijim presudama, kao što je USER-5, okrivljeni su takođe kažnjeni sa 33 meseca zatvora. Ova kazna odgovara težini počinaka i namera da se preduzmu mere za ujednačenost kaznene politike.</p>
+        <p>U ovom slučaju, okrivljeni je postupao u svojstvu odgovornog lica, a zagađenje je izvršeno u većoj meri. Zato se smatra da je potrebna kazna koja će odgovarati težini počinaka i da bi se preduzele mere za prevenciju budućih počinaka istog tipa.</p>
+        <p>Za ovaj slučaj, okrivljenom je izrečena kazna zatvora u trajanju od 33 meseci.</p>
+        
+        <p>Pri odmeravanju kazne sud je imao u vidu sličnu sudsku praksu: USER-5 — 33 meseci.</p>
+      </motivation>
+    </judgmentBody>
+  </judgment>
+</akomaNtoso>

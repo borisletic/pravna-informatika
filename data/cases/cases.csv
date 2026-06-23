@@ -7,3 +7,4 @@ id,source,sourceJudgmentId,substanceQuantityM3,substanceType,pollutionTarget,dam
 "2","USER","","","","VODA","","UMISLJAJ","","","","art_266__para_5","ZATVOR","78"
 "3","USER","","","","VISESTRUKO","","NEHAT","","","","art_260__para_4","ZATVOR","51"
 "4","USER","","","","VAZDUH","","UMISLJAJ","","","","art_266__para_2","ZATVOR","54"
+"5","USER","","12.0","","VODA","","NEHAT","","","","art_260__para_4","ZATVOR","33"
