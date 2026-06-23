@@ -1,124 +1,176 @@
 """
-Ekstrakcija pravnih činjenica iz teksta.
+fact_extractor.py
 VLASNIK: Član 2.
 CELINA: 4.
 
-Proširena verzija sa sveobuhvatnim Regex pravilima za obuhvatanje
-srpske pravne terminologije (ćirilica i latinica, različiti padeži).
-Obezbeđuje maksimalnu ekstrakciju bez halucinacija.
+HIBRIDNI EKSTRAKTOR (spaCy + Regex)
+Ova skripta obrađuje korisničke upite uživo. Koristi dependency parsing 
+za prepoznavanje konteksta i negacija (npr. "nije osuđivan"), 
+a regex za precizno hvatanje numeričkih vrednosti.
 """
+
 import re
+import spacy
 from typing import List
 
-def extract_facts(text: str) -> List:
-    from main import Fact, SourceSpan
-    facts = []
-    text_lower = text.lower()
+# Učitavamo NLP model na nivou modula (da se ne bi učitavao pri svakom requestu)
+print("Učitavam spaCy model (hr_core_news_sm) za fact_extractor...")
+try:
+    nlp = spacy.load("hr_core_news_sm")
+except OSError:
+    print("[UPOZORENJE] SpaCy model nije pronađen. Pokrenite: python -m spacy download hr_core_news_sm")
+    nlp = None
 
-    # Pomoćna funkcija za dodavanje činjenica bez dupliranja
-    def add_fact(predicate, value, confidence, match=None):
-        span = SourceSpan(start=match.start(), end=match.end()) if match else None
+def check_negation(token) -> bool:
+    """
+    Proverava da li je dati spaCy token negiran u rečenici.
+    Gleda decu tokena u drvetu zavisnosti, kao i neposredno prethodne reči.
+    """
+    # 1. Provera kroz dependency parsing (deca tokena)
+    for child in token.children:
+        if child.text.lower() in ["ne", "nije", "nikad", "nikada", "nema"]:
+            return True
+            
+    # 2. Linearna provera (za svaki slučaj, ako parser omaši granu)
+    if token.i > 0:
+        prev_token = token.doc[token.i - 1].text.lower()
+        if prev_token in ["ne", "nije", "nikad", "nikada"]:
+            return True
+            
+    return False
+
+def extract_facts(text: str) -> List:
+    """
+    Glavni ulaz - prima sirov tekst presude i vraća listu Fact objekata.
+    """
+    try:
+        from main import Fact, SourceSpan
+    except ImportError:
+        # Fallback strukture ukoliko se skripta testira izolovano van FastAPI-ja
+        class SourceSpan:
+            def __init__(self, start, end): 
+                self.start = start
+                self.end = end
+        class Fact:
+            def __init__(self, predicate, value, confidence, sourceSpan=None):
+                self.predicate = predicate
+                self.value = value
+                self.confidence = confidence
+                self.sourceSpan = sourceSpan
+
+    facts = []
+    
+    # Ako spaCy nije učitan iz nekog razloga, oslanjamo se samo na string
+    text_lower = text.lower()
+    doc = nlp(text) if nlp else None
+
+    # Pomoćna funkcija za bezbedno dodavanje činjenica (sprečava duplikate istog predikata)
+    def add_fact(predicate, value, confidence, start_idx, end_idx):
         if not any(f.predicate == predicate for f in facts):
+            span = SourceSpan(start=start_idx, end=end_idx)
             facts.append(Fact(predicate=predicate, value=value, confidence=confidence, sourceSpan=span))
 
-    # === 1. substanceQuantityM3 ===
-    m_qty = re.search(r'(\d+(?:[.,]\d+)?)\s*(?:m³|m3|m\^3|кубних|kubnih|кубика|kubika)', text_lower)
+    # =====================================================================
+    # 1. SPACY DEEP LEARNING EKSTRAKCIJA (Kontekst i Negacije)
+    # =====================================================================
+    if doc:
+        for token in doc:
+            word = token.text.lower()
+            lemma = token.lemma_.lower()
+
+            # --- PRIOR CONVICTION (Da li je osuđivan) ---
+            if word in ["osuđivan", "osuđivana", "kažnjavan", "kažnjavana"] or lemma == "osuđivati":
+                is_negated = check_negation(token)
+                add_fact(
+                    predicate="priorConviction", 
+                    value="NE" if is_negated else "DA", 
+                    confidence=0.85, 
+                    start_idx=token.idx, 
+                    end_idx=token.idx + len(token.text)
+                )
+
+            # --- REMEDIED DAMAGE (Da li je sanirao štetu) ---
+            if lemma in ["sanirati", "otkloniti", "nadoknaditi", "popraviti"] and token.dep_ in ["ROOT", "xcomp", "ccomp", "conj"]:
+                # Tražimo objekat glagola (šta je sanirao? -> štetu, posledice)
+                has_damage_obj = any(child.lemma_.lower() in ["šteta", "posledica", "kvar"] for child in token.children)
+                
+                # Čak i ako ne nađe savršen objekat, ako smo u ekološkom domenu, pretpostavljamo
+                is_negated = check_negation(token)
+                add_fact(
+                    predicate="remediedDamage", 
+                    value="NE" if is_negated else "DA", 
+                    confidence=0.8, 
+                    start_idx=token.idx, 
+                    end_idx=token.idx + len(token.text)
+                )
+
+    # =====================================================================
+    # 2. NAPREDNI REGEX (Količine i eksplicitne ključne reči)
+    # =====================================================================
+    
+    # --- INTENT (Umišljaj / Nehat) ---
+    m_intent = re.search(r'\b(умишљај|umišljaj|свесно|svesno|намерно|namerno)\b', text_lower)
+    if m_intent:
+        add_fact("intent", "UMISLJAJ", 0.9, m_intent.start(), m_intent.end())
+    else:
+        m_nehat = re.search(r'\b(нехат|nehat|непажњ|nepažnj)\b', text_lower)
+        if m_nehat:
+            add_fact("intent", "NEHAT", 0.9, m_nehat.start(), m_nehat.end())
+
+    # --- POLLUTION TARGET (Meta zagađenja) ---
+    m_target = re.search(r'\b(voda|vode|vodu|vodu|vazduh|atmosferu|tlo|zemljište|šuma|šumu|šume)\b', text_lower)
+    if m_target:
+        val = m_target.group(1)
+        if val in ["voda", "vode", "vodu"]: target_val = "VODA"
+        elif val in ["vazduh", "atmosferu"]: target_val = "VAZDUH"
+        elif val in ["tlo", "zemljište"]: target_val = "TLO"
+        elif val in ["šuma", "šumu", "šume"]: target_val = "SUMA"
+        else: target_val = "VODA" # fallback
+        add_fact("pollutionTarget", target_val, 0.85, m_target.start(), m_target.end())
+
+    # --- SUBSTANCE TYPE (Tip supstance) ---
+    if re.search(r'\b(opasn[a-z]+ materij[a-z]+|otrov|kiselina|hemikalija)\b', text_lower):
+        m_sub = re.search(r'\b(opasn[a-z]+ materij[a-z]+|otrov|kiselina|hemikalija)\b', text_lower)
+        add_fact("substanceType", "OPASNE_MATERIJE", 0.85, m_sub.start(), m_sub.end())
+    elif re.search(r'\b(naft[a-z]*|benzin|goriv[a-z]*|ulj[ea])\b', text_lower):
+        m_sub = re.search(r'\b(naft[a-z]*|benzin|goriv[a-z]*|ulj[ea])\b', text_lower)
+        add_fact("substanceType", "NAFTNI_DERIVATI", 0.85, m_sub.start(), m_sub.end())
+    elif re.search(r'\b(drvo|stabl[oa]|drveć[ea])\b', text_lower):
+        m_sub = re.search(r'\b(drvo|stabl[oa]|drveć[ea])\b', text_lower)
+        add_fact("substanceType", "DRVO", 0.85, m_sub.start(), m_sub.end())
+    elif re.search(r'\b(rib[ea]|srn[ea]|divljač|životinj[ea])\b', text_lower):
+        m_sub = re.search(r'\b(rib[ea]|srn[ea]|divljač|životinj[ea])\b', text_lower)
+        add_fact("substanceType", "ZIVOTINJE_RIBE", 0.85, m_sub.start(), m_sub.end())
+    elif re.search(r'\b(otpad|smeć[ea]|deponij[ea])\b', text_lower):
+        m_sub = re.search(r'\b(otpad|smeć[ea]|deponij[ea])\b', text_lower)
+        add_fact("substanceType", "KOMUNALNI_OTPAD", 0.85, m_sub.start(), m_sub.end())
+
+    # --- QUANTITIES (M3 i Hektari) ---
+    m_qty = re.search(r'(\d+(?:[.,]\d+)?)\s*(?:m³|m3|m\^3|kubn|kubik)', text_lower)
     if m_qty:
         try:
             val = float(m_qty.group(1).replace(',', '.'))
-            add_fact("substanceQuantityM3", val, 0.95, m_qty)
-        except ValueError: pass
+            add_fact("substanceQuantityM3", str(val), 0.95, m_qty.start(), m_qty.end())
+        except ValueError:
+            pass
 
-    # === 2. forestAreaHa ===
-    m_ha = re.search(r'(\d+(?:[.,]\d+)?)\s*(?:ha|хектара|hektara|ари|ari|ar|ар\b)', text_lower)
+    m_ha = re.search(r'(\d+(?:[.,]\d+)?)\s*(?:ha|hektar|ar[ia])', text_lower)
     if m_ha:
         try:
             val = float(m_ha.group(1).replace(',', '.'))
-            if 'ar' in m_ha.group(0) or 'ар' in m_ha.group(0):
-                val /= 100.0
-            add_fact("forestAreaHa", val, 0.95, m_ha)
-        except ValueError: pass
+            add_fact("forestAreaHa", str(val), 0.95, m_ha.start(), m_ha.end())
+        except ValueError:
+            pass
 
-    # === 3. pollutionTarget ===
-    if re.search(r'\b(река|reka|реку|reku|реци|reci|језер|jezer|воду|vodu|води|vodi|море|more|поток|potok|канал|kanal)\b', text_lower):
-        add_fact("pollutionTarget", "VODA", 0.85)
-    elif re.search(r'\b(ваздух|vazduh|атмосфер|atmosfer|дим|dim)\b', text_lower):
-        add_fact("pollutionTarget", "VAZDUH", 0.85)
-    elif re.search(r'\b(тло|tlo|земљишт|zemljišt|земљ|zemlj|њив|njiv)\b', text_lower):
-        add_fact("pollutionTarget", "TLO", 0.85)
-    elif re.search(r'\b(шум|šum|парк|park|дрвећ|drveć)\b', text_lower):
-        add_fact("pollutionTarget", "SUMA", 0.85)
-
-    # === 4. intent (Umišljaj / Nehat) ===
-    if re.search(r'\b(умишљај|umišljaj|намерно|namerno|свесн[оа]|svesn[oa]|хтео|hteo|хтела|htela|са\sумишљајем|sa\sumišljajem)\b', text_lower):
-        add_fact("intent", "UMISLJAJ", 0.85)
-    elif re.search(r'\b(нехат|nehat|непажњ|nepažnj|из\sнехата|iz\snehata|олако|olako)\b', text_lower):
-        add_fact("intent", "NEHAT", 0.85)
-
-    # === 5. priorConviction (Prethodna osuđivanost) ===
-    # Neosuđivanost ima prioritet proveravanja
-    if re.search(r'\b(неосуђиван|neosuđivan|раније\sнеосуђиван|ranije\sneosuđivan|без\sпретходних|bez\sprethodnih|није\sосуђиван|nije\sosuđivan)\b', text_lower):
-        add_fact("priorConviction", "False", 0.9)
-    elif re.search(r'\b(раније\sосуђиван|ranije\sosuđivan|претходно\sосуђиван|prethodno\sosuđivan|осуђиван|osuđivan|повратник|povratnik)\b', text_lower):
-        add_fact("priorConviction", "True", 0.9)
-
-    # === 6. remediedDamage (Sanirana šteta) ===
-    if re.search(r'\b(отклонио|otklonio|надокнадио|nadoknadio|санирао|sanirao|поправио|popravio|вратио|vratio|исплатио|isplatio)\b', text_lower):
-        add_fact("remediedDamage", "True", 0.8)
-
-    # === 7. damageExtent (Obim oštećenja) ===
-    if re.search(r'\b(велика|velika|знатна|znatna|огромна|ogromna|већих\sразмера|većih\srazmera)\b', text_lower):
-        add_fact("damageExtent", "VELIKA", 0.8)
-    elif re.search(r'\b(мала|mala|незнатна|neznatna|мањег\sобима|manjeg\sobima)\b', text_lower):
-        add_fact("damageExtent", "MALA", 0.8)
-
-    # === 8. substanceType (Tip materije / predmeta dela) ===
-    if re.search(r'\b(нафт|naft|горив|goriv|бензин|benzin|мазут|mazut|уљ[еа]|ulj[ea])\b', text_lower):
-        add_fact("substanceType", "NAFTNI_DERIVATI", 0.85)
-    elif re.search(r'\b(отпад|otpad|смећ|smeć|депониј|deponij|шут|šut)\b', text_lower):
-        add_fact("substanceType", "KOMUNALNI_OTPAD", 0.85)
-    elif re.search(r'\b(хемикалиј|hemikalij|отров|otrov|киселин|kiselin|опасн|opasn)\b', text_lower):
-        add_fact("substanceType", "OPASNE_MATERIJE", 0.85)
-    elif re.search(r'\b(дрв[оа]|drv[oa]|стабл[оа]|stabl[oa]|шумск|šumsk|балван|balvan)\b', text_lower):
-        add_fact("substanceType", "DRVO", 0.85)
-    elif re.search(r'\b(риб[аеу]|rib[aeu]|мреж[ае]|mrež[ae]|дивљач|divljač|срн[ае]|srn[ae]|фазан|fazan|бабушк[ае]|babušk[ae]|штук[ае]|štuk[ae])\b', text_lower):
-        add_fact("substanceType", "ZIVOTINJE_RIBE", 0.85)
-
-    # === 9. articleViolated (Prekršeni član zakona) ===
-    m_art = re.search(r'\bчл(?:ан|ана|\.)?\s*(26[0-9]|27[0-7])\b', text_lower)
-    if m_art:
-        add_fact("articleViolated", f"art_{m_art.group(1)}", 0.9, m_art)
-
-    # === 10. sentenceType (Vrsta kazne) ===
-    if re.search(r'\b(условн[ау]\sосуд[ау]|uslovn[au]\sosud[au]|условно|uslovno)\b', text_lower):
-        add_fact("sentenceType", "USLOVNA", 0.9)
-    elif re.search(r'\b(затвор|zatvor)\b', text_lower):
-        add_fact("sentenceType", "ZATVOR", 0.9)
-    elif re.search(r'\b(новчан[ау]\sказн[ау]|novčan[au]\skazn[au])\b', text_lower):
-        add_fact("sentenceType", "NOVCANA", 0.9)
-
-    # === 11. sentenceMonths (Dužina kazne) ===
-    m_months = re.search(r'(\d+)\s*(?:месеца|meseca|месеци|meseci)', text_lower)
-    m_years = re.search(r'(\d+)\s*(?:годин|godin)', text_lower)
-    
-    # Konverzija tekstualnih brojeva u numeričke vrednosti
-    text_nums = {
-        'један': '1', 'два': '2', 'три': '3', 'четири': '4', 'пет': '5', 'шест': '6',
-        'седам': '7', 'осам': '8', 'девет': '9', 'десет': '10', 'једну': '12'
-    }
-    
-    if m_months:
-        add_fact("sentenceMonths", m_months.group(1), 0.85, m_months)
-    else:
-        for text_num, num in text_nums.items():
-            if re.search(rf'\b{text_num}\s*(?:месеца|meseca|месеци|meseci|годину|godinu)\b', text_lower):
-                add_fact("sentenceMonths", num, 0.85)
-                break
-
-    if not any(f.predicate == "sentenceMonths" for f in facts) and m_years:
-        try:
-            months = int(m_years.group(1)) * 12
-            add_fact("sentenceMonths", str(months), 0.85, m_years)
-        except ValueError: pass
+    # --- SENTENCE TYPE (Tip presude) ---
+    if re.search(r'\b(zatvor[a-z]*)\b', text_lower):
+        m_sent = re.search(r'\b(zatvor[a-z]*)\b', text_lower)
+        add_fact("sentenceType", "ZATVOR", 0.9, m_sent.start(), m_sent.end())
+    elif re.search(r'\b(uslovn[a-z]* osud[a-z]*)\b', text_lower):
+        m_sent = re.search(r'\b(uslovn[a-z]* osud[a-z]*)\b', text_lower)
+        add_fact("sentenceType", "USLOVNA", 0.9, m_sent.start(), m_sent.end())
+    elif re.search(r'\b(novčan[a-z]* kazn[a-z]*)\b', text_lower):
+        m_sent = re.search(r'\b(novčan[a-z]* kazn[a-z]*)\b', text_lower)
+        add_fact("sentenceType", "NOVCANA", 0.9, m_sent.start(), m_sent.end())
 
     return facts

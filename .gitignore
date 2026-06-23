@@ -40,6 +40,7 @@ Thumbs.db
 nlp-service/models/*.bin
 nlp-service/models/*.pt
 nlp-service/models/*.safetensors
+nlp-service/venv
 
 # Privremeni izlazi
 /tmp/
