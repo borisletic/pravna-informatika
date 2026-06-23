@@ -125,6 +125,7 @@ def extract_facts_llm(text: str):
                 "model": OLLAMA_MODEL,
                 "format": "json",
                 "stream": False,
+                "keep_alive": "30m",   # drži model učitan da sledeći pozivi budu brzi
                 "options": {"temperature": 0},
                 "messages": [
                     {"role": "system", "content": SYSTEM_PROMPT},

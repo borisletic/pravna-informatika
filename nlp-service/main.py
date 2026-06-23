@@ -132,6 +132,7 @@ def generate_decision(request: GenerateRequest):
             json={
                 "model": model,
                 "stream": False,
+                "keep_alive": "30m",
                 "options": {"temperature": 0.4},
                 "messages": [
                     {"role": "system", "content": system},

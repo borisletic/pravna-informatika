@@ -42,7 +42,10 @@ app:
   data-dir: ${DATA_DIR:./data}
   nlp:
     base-url: http://localhost:8000
-    timeout-seconds: 30
+    # Lokalni LLM (Ollama na CPU) može da odgovara sporo, posebno na prvom (hladnom)
+    # pozivu dok se model učitava. Veći timeout sprečava da Java odustane i izgubi
+    # i regex rezultate. Smanji ako koristiš manji/brži model.
+    timeout-seconds: ${NLP_TIMEOUT:150}
   reasoning:
     rules-file: ${app.data-dir}/rules/environmental_rules.lrml
     cases-file: ${app.data-dir}/cases/cases.csv
