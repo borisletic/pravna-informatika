@@ -193,18 +193,45 @@ public class AkomaNtosoParser {
                     .orElse("");
             String fullBodyText = String.join("\n", bodyParagraphs);
 
-            // 3. Sud i datum - heuristika
-            String court = extractCourt(headBlock);
-            LocalDate date = extractDate(headBlock, frbrThis);
+            // 3. Sud: prvo iz anotacije (FRBRalias[court] / FRBRauthor), pa heuristika
+            String court = xpathString(xpath, doc,
+                    "//akn:judgment//akn:FRBRalias[@name='court']/@value");
+            if (court == null || court.isBlank()) {
+                court = extractCourt(headBlock);
+            }
 
-            // 4. Reference ka članovima
-            List<String> referencedArticles = extractArticleReferences(fullBodyText);
+            // 4. Datum: prvo iz anotacije (FRBRdate name=judgment), pa heuristika
+            LocalDate date = null;
+            String dateAnno = xpathString(xpath, doc,
+                    "//akn:judgment//akn:FRBRWork/akn:FRBRdate[@name='judgment']/@date");
+            if (dateAnno != null && !dateAnno.isBlank()) {
+                try { date = LocalDate.parse(dateAnno.trim()); } catch (Exception ignored) {}
+            }
+            if (date == null) {
+                date = extractDate(headBlock, frbrThis);
+            }
+
+            // 5. Reference ka članovima: prvo eksplicitni <ref href=.../kz#art_N>,
+            //    pa fallback heuristika. Eksplicitni refovi sprečavaju lažne reference
+            //    (npr. procesni članovi ZKP-a) jer su anotirani samo pravi članovi KZ.
+            List<String> referencedArticles = extractRefArticles(xpath, doc);
+            if (referencedArticles.isEmpty()) {
+                referencedArticles = extractArticleReferences(fullBodyText);
+            }
+
+            // 6. Osobe iz <references> (TLCPerson / TLCOrganization)
+            List<String> judges = extractTlcByPrefix(xpath, doc, "judge");
+            String recorder = firstOrNull(extractTlcByEid(xpath, doc, "recorder"));
+            List<Judgment.Party> parties = extractParties(xpath, doc);
 
             return Judgment.builder()
                     .id(id)
                     .caseNumber(caseNumber)
                     .court(court)
                     .date(date)
+                    .judges(judges)
+                    .recorder(recorder)
+                    .parties(parties)
                     .factualBackground(fullBodyText)
                     .referencedArticles(referencedArticles)
                     .xmlPath(xmlPath.toString())
@@ -413,6 +440,78 @@ public class AkomaNtosoParser {
             } catch (Exception ignored) {}
         }
         return new ArrayList<>(articles);
+    }
+
+    /**
+     * Eksplicitne reference na članove iz anotiranih {@code <ref href=".../kz#art_N">}.
+     * Vraća ["art_274", ...] bez duplikata. Prazno ako nema anotiranih ref-ova.
+     */
+    private List<String> extractRefArticles(XPath xpath, Document doc) throws Exception {
+        Set<String> articles = new LinkedHashSet<>();
+        NodeList refs = (NodeList) xpath.evaluate(
+                "//akn:judgmentBody//akn:ref/@href", doc, XPathConstants.NODESET);
+        Pattern p = Pattern.compile("art_(\\d{1,3})");
+        for (int i = 0; i < refs.getLength(); i++) {
+            String href = refs.item(i).getNodeValue();
+            if (href == null) continue;
+            Matcher m = p.matcher(href);
+            if (m.find()) {
+                articles.add("art_" + m.group(1));
+            }
+        }
+        return new ArrayList<>(articles);
+    }
+
+    /** showAs vrednosti TLCPerson-a čiji eId počinje datim prefiksom (npr. "judge"). */
+    private List<String> extractTlcByPrefix(XPath xpath, Document doc, String eidPrefix)
+            throws Exception {
+        List<String> out = new ArrayList<>();
+        NodeList nodes = (NodeList) xpath.evaluate(
+                "//akn:references//akn:TLCPerson", doc, XPathConstants.NODESET);
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element el = (Element) nodes.item(i);
+            if (el.getAttribute("eId").startsWith(eidPrefix)) {
+                String showAs = el.getAttribute("showAs");
+                if (showAs != null && !showAs.isBlank()) out.add(showAs.trim());
+            }
+        }
+        return out;
+    }
+
+    private List<String> extractTlcByEid(XPath xpath, Document doc, String eid) throws Exception {
+        List<String> out = new ArrayList<>();
+        NodeList nodes = (NodeList) xpath.evaluate(
+                "//akn:references//akn:TLCPerson[@eId='" + eid + "']/@showAs",
+                doc, XPathConstants.NODESET);
+        for (int i = 0; i < nodes.getLength(); i++) {
+            String v = nodes.item(i).getNodeValue();
+            if (v != null && !v.isBlank()) out.add(v.trim());
+        }
+        return out;
+    }
+
+    /** TLCPerson eId="party_{role}_{n}" -> Party(role, initials=showAs). */
+    private List<Judgment.Party> extractParties(XPath xpath, Document doc) throws Exception {
+        List<Judgment.Party> out = new ArrayList<>();
+        NodeList nodes = (NodeList) xpath.evaluate(
+                "//akn:references//akn:TLCPerson", doc, XPathConstants.NODESET);
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element el = (Element) nodes.item(i);
+            String eId = el.getAttribute("eId");
+            if (eId.startsWith("party_")) {
+                String[] parts = eId.split("_");
+                String role = parts.length > 1 ? parts[1].toUpperCase() : "OKR";
+                out.add(Judgment.Party.builder()
+                        .role(role)
+                        .initials(el.getAttribute("showAs"))
+                        .build());
+            }
+        }
+        return out;
+    }
+
+    private String firstOrNull(List<String> list) {
+        return list.isEmpty() ? null : list.get(0);
     }
 
     // ============================================================

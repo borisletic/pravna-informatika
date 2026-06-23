@@ -90,6 +90,46 @@ def extract_all(request: ExtractionRequest):
         print(f"[ERROR] Greška tokom NLP ekstrakcije: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Interna greška servera: {str(e)}")
 
+class GenerateRequest(BaseModel):
+    prompt: str = Field(..., description="Pun prompt za generisanje obrazloženja odluke")
+
+
+class GenerateResponse(BaseModel):
+    available: bool
+    text: Optional[str] = None
+
+
+@app.post("/generate-decision", response_model=GenerateResponse)
+def generate_decision(request: GenerateRequest):
+    """
+    Celina 9 — generisanje obrazloženja odluke jezičkim modelom (LLM), po ugledu
+    na postojeće presude. Aktivira se ako je postavljen OPENAI_API_KEY; u suprotnom
+    vraća available=false pa Java aplikacija koristi šablonski generator.
+    """
+    import os
+    key = os.environ.get("OPENAI_API_KEY")
+    if not key:
+        return GenerateResponse(available=False)
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=key)
+        resp = client.chat.completions.create(
+            model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+            messages=[
+                {"role": "system", "content":
+                    "Ti si sudija Republike Srbije. Pišeš obrazloženje presude za krivična dela "
+                    "protiv životne sredine (KZ čl. 260-277), formalnim pravnim stilom, po ugledu "
+                    "na postojeće presude. Vrati isključivo tekst obrazloženja (2-4 pasusa), bez naslova."},
+                {"role": "user", "content": request.prompt},
+            ],
+            temperature=0.4,
+        )
+        return GenerateResponse(available=True, text=resp.choices[0].message.content.strip())
+    except Exception as e:
+        print(f"[ERROR] LLM generisanje nije uspelo: {e}")
+        return GenerateResponse(available=False)
+
+
 # Dodato je "app."
 @app.get("/health")
 def health_check():

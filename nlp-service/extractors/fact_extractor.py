@@ -10,15 +10,17 @@ a regex za precizno hvatanje numeričkih vrednosti.
 """
 
 import re
-import spacy
 from typing import List
 
-# Učitavamo NLP model na nivou modula (da se ne bi učitavao pri svakom requestu)
-print("Učitavam spaCy model (hr_core_news_sm) za fact_extractor...")
+# Učitavamo NLP model na nivou modula (da se ne bi učitavao pri svakom requestu).
+# spaCy je opcioni: ako nije instaliran ili model nedostaje, radimo u regex-only modu
+# (numeričke/ključne-reči činjenice rade; priorConviction/remediedDamage zahtevaju spaCy).
 try:
+    import spacy
     nlp = spacy.load("hr_core_news_sm")
-except OSError:
-    print("[UPOZORENJE] SpaCy model nije pronađen. Pokrenite: python -m spacy download hr_core_news_sm")
+    print("spaCy model (hr_core_news_sm) učitan za fact_extractor.")
+except Exception:
+    print("[UPOZORENJE] spaCy/model nije dostupan — fact_extractor radi u regex-only modu.")
     nlp = None
 
 def check_negation(token) -> bool:
@@ -109,11 +111,11 @@ def extract_facts(text: str) -> List:
     # =====================================================================
     
     # --- INTENT (Umišljaj / Nehat) ---
-    m_intent = re.search(r'\b(умишљај|umišljaj|свесно|svesno|намерно|namerno)\b', text_lower)
+    m_intent = re.search(r'(умишљај|umišljaj|свесно|svesno|намерно|namerno)', text_lower)
     if m_intent:
         add_fact("intent", "UMISLJAJ", 0.9, m_intent.start(), m_intent.end())
     else:
-        m_nehat = re.search(r'\b(нехат|nehat|непажњ|nepažnj)\b', text_lower)
+        m_nehat = re.search(r'(нехат|nehat|непажњ|nepažnj|nepaznj)', text_lower)
         if m_nehat:
             add_fact("intent", "NEHAT", 0.9, m_nehat.start(), m_nehat.end())
 
@@ -161,6 +163,36 @@ def extract_facts(text: str) -> List:
             add_fact("forestAreaHa", str(val), 0.95, m_ha.start(), m_ha.end())
         except ValueError:
             pass
+
+    # --- ECOLOGICAL DAMAGE / DAMAGE EXTENT (obim ekološke štete) ---
+    # hrani pravila R3/R4 (ecologicalDamage) i CBR (damageExtent)
+    m_dmg_big = re.search(
+        r'(великих\s+размера|velikih\s+razmera|масовн|masovn|тешк[а-яђјљњћџ]+\s+последиц'
+        r'|znatne\s+posledice|уништен[а-яђјљњћџ]+\s+(?:биљн|животињск))',
+        text_lower)
+    m_dmg_small = re.search(r'(мањ[аеи]\s+штет|manj[aei]\s+štet|незнатн|neznatn|обичн|običn)', text_lower)
+    if m_dmg_big:
+        add_fact("ecologicalDamage", "VELIKIH_RAZMERA", 0.8, m_dmg_big.start(), m_dmg_big.end())
+        add_fact("damageExtent", "VELIKA", 0.8, m_dmg_big.start(), m_dmg_big.end())
+    elif m_dmg_small:
+        add_fact("ecologicalDamage", "OBICNA", 0.75, m_dmg_small.start(), m_dmg_small.end())
+        add_fact("damageExtent", "MALA", 0.75, m_dmg_small.start(), m_dmg_small.end())
+
+    # --- PROTECTED SPECIES (zaštićena vrsta — čl. 265 st. 3, čl. 276) ---
+    m_prot = re.search(
+        r'(строго\s+заштићен|строго\s+zaštićen|заштићен[а-яђјљњћџ]*\s+врст|zaštićen[a-zšđčćž]*\s+vrst|'
+        r'заштићен[а-яђјљњћџ]*\s+(?:биљн|животињск|природн)|natura\s*2000)',
+        text_lower)
+    if m_prot:
+        add_fact("protectedSpecies", "DA", 0.8, m_prot.start(), m_prot.end())
+
+    # --- USES EXPLOSIVES (upotreba eksploziva/struje — čl. 276 lov/ribolov) ---
+    m_expl = re.search(
+        r'(експлозив|eksploziv|минско[\s-]*експлозивн|динамит|dinamit|'
+        r'електрич[а-яђјљњћџ]*\s+струј|električn[a-zšđčćž]*\s+struj|бомб[аеу])',
+        text_lower)
+    if m_expl:
+        add_fact("usesExplosives", "DA", 0.8, m_expl.start(), m_expl.end())
 
     # --- SENTENCE TYPE (Tip presude) ---
     if re.search(r'\b(zatvor[a-z]*)\b', text_lower):

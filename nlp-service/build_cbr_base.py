@@ -37,9 +37,12 @@ def get_text_from_xml(xml_path):
             
         text_content = []
         for p in paragraphs:
-            if p.text:
-                text_content.append(p.text.strip())
-                
+            # itertext() hvata i tekst unutar <ref> dece (anotirane presude),
+            # za razliku od p.text koji uzima samo tekst pre prvog deteta.
+            t = "".join(p.itertext()).strip()
+            if t:
+                text_content.append(t)
+
         full_text = " ".join(text_content)
         # Agresivno čišćenje višestrukih razmaka i preloma
         full_text = re.sub(r'\s+', ' ', full_text)

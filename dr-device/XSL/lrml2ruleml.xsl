@@ -27,7 +27,7 @@
         <RuleML>
             <xsl:attribute name="proof">proof.ruleml</xsl:attribute>
             <xsl:attribute name="rdf_export">export.rdf</xsl:attribute>
-            <xsl:attribute name="rdf_export_classes">violates_260_1 violates_260_2 violates_260_3 violates_260_4 violates_261_1 violates_262_1 violates_263_1 violates_265_1 violates_265_3 violates_266_1 violates_266_2 violates_266_5 violates_267_1 violates_268_1 min_imprisonment max_imprisonment</xsl:attribute>
+            <xsl:attribute name="rdf_export_classes">violates_260_1 violates_260_2 violates_260_3 violates_260_4 violates_261_1 violates_262_1 violates_263_1 violates_265_1 violates_265_3 violates_266_1 violates_266_2 violates_266_5 violates_267_1 violates_268_1 violates_269_1 violates_269_2 violates_269_3 violates_270_1 violates_270_3 violates_270_4 violates_271_1 violates_271_2 violates_272_1 violates_272_2 violates_272_3 violates_273_1 violates_273_3 violates_273_4 violates_274_1 violates_274_2 violates_275_1 violates_275_2 violates_276_1 violates_276_2 violates_276_3 violates_276_4 violates_277_1 violates_277_2 violates_277_3 min_imprisonment max_imprisonment</xsl:attribute>
             <xsl:attribute name="rdf_import">&quot;facts.rdf&quot;</xsl:attribute>
             <xsl:apply-templates select="lrml:Statements"/>
         </RuleML>

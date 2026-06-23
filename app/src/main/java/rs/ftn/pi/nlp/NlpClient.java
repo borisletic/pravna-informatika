@@ -37,6 +37,28 @@ public class NlpClient {
         return extract(text, "CASE_DESCRIPTION");
     }
 
+    /**
+     * Celina 9 — traži od NLP servisa (LLM) da generiše obrazloženje odluke.
+     * Vraća null ako LLM nije konfigurisan/dostupan (Java tada koristi šablon).
+     */
+    public String generateDecisionText(String prompt) {
+        try {
+            NlpDtos.GenerateResponse resp = nlpWebClient.post()
+                    .uri("/generate-decision")
+                    .bodyValue(NlpDtos.GenerateRequest.builder().prompt(prompt).build())
+                    .retrieve()
+                    .bodyToMono(NlpDtos.GenerateResponse.class)
+                    .timeout(Duration.ofSeconds(Math.max(appConfig.getNlp().getTimeoutSeconds(), 60)))
+                    .block();
+            if (resp != null && resp.isAvailable() && resp.getText() != null && !resp.getText().isBlank()) {
+                return resp.getText();
+            }
+        } catch (Exception e) {
+            log.warn("LLM generisanje odluke nije dostupno: {}", e.getMessage());
+        }
+        return null;
+    }
+
     private NlpDtos.ExtractResponse extract(String text, String documentType) {
         log.debug("NLP poziv: documentType={}, dužina teksta={}", documentType, text.length());
 

@@ -111,6 +111,41 @@ class DrDeviceReasonerTest {
     }
 
     @Test
+    @DisplayName("R269: ubijanje/zlostavljanje zivotinje -> cl. 269 st. 1")
+    void test_animal_killing() {
+        ReasoningResult r = reasoner.reason(facts(Map.of("killsOrAbusesAnimal", true)));
+        assertThat(r.getViolatedArticles())
+                .extracting(ViolatedArticle::getArticleEId)
+                .contains("art_269__para_1");
+    }
+
+    @Test
+    @DisplayName("R275: sumska kradja preko 5 m3 -> kvalifikovani st.2 pobija st.1")
+    void test_forest_theft_qualified() {
+        ReasoningResult r = reasoner.reason(facts(Map.of(
+                "forestTheftOverOneM3", true,
+                "overFiveCubicMeters", true
+        )));
+        assertThat(r.getViolatedArticles())
+                .extracting(ViolatedArticle::getArticleEId)
+                .contains("art_275__para_2")
+                .doesNotContain("art_275__para_1");
+        assertThat(r.getSentenceProposal().getMaxMonths()).isEqualTo(36);
+    }
+
+    @Test
+    @DisplayName("R277: ribolov eksplozivom -> st.2 pobija st.1")
+    void test_illegal_fishing_explosives() {
+        ReasoningResult r = reasoner.reason(facts(Map.of(
+                "illegalFishingClosedSeason", true,
+                "usesExplosives", true
+        )));
+        assertThat(r.getViolatedArticles())
+                .extracting(ViolatedArticle::getArticleEId)
+                .contains("art_277__para_2");
+    }
+
+    @Test
     @DisplayName("Prazne cinjenice -> nijedno pravilo nije dokazano")
     void test_empty_facts() {
         ReasoningResult r = reasoner.reason(new CaseFacts());

@@ -56,4 +56,15 @@ public class NlpDtos {
         private Integer start;
         private Integer end;
     }
+
+    @Data @NoArgsConstructor @AllArgsConstructor @Builder
+    public static class GenerateRequest {
+        private String prompt;
+    }
+
+    @Data @NoArgsConstructor @AllArgsConstructor @Builder
+    public static class GenerateResponse {
+        private boolean available;
+        private String text;
+    }
 }

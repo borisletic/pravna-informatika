@@ -257,6 +257,20 @@ predicates:
     cbr_key: true
     cbr_weight: 0.05
 
+  protectedSpecies:
+    type: boolean
+    description: "Delo se odnosi na strogo zaštićenu/zaštićenu vrstu (čl. 265 st. 3, čl. 276)"
+    used_in_rules: []
+    cbr_key: true
+    cbr_weight: 0.05
+
+  usesExplosives:
+    type: boolean
+    description: "Upotreba eksploziva/struje pri lovu ili ribolovu (čl. 276)"
+    used_in_rules: []
+    cbr_key: true
+    cbr_weight: 0.05
+
   # ============================================================
   # IZVEDENI METAPODACI IZ ODLUKE (NLP iz već donesene presude)
   # ============================================================

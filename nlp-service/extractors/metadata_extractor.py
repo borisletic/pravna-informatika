@@ -7,15 +7,16 @@ VLASNIK: Član 2.
 """
 
 import re
-import spacy
 from typing import List
 
-print("Učitavam spaCy NLP model (hr_core_news_sm)...")
+# spaCy je opcioni — bez njega metapodaci se vade regex-om (broj, datum, sud);
+# imena sudija/stranaka zahtevaju spaCy NER.
 try:
+    import spacy
     nlp = spacy.load("hr_core_news_sm")
-    print("Model uspešno učitan!")
-except OSError:
-    print("Greška: Model nije pronađen. Pokrenite u terminalu: python -m spacy download hr_core_news_sm")
+    print("spaCy NLP model (hr_core_news_sm) učitan.")
+except Exception:
+    print("[UPOZORENJE] spaCy/model nije dostupan — metadata_extractor radi u regex-only modu.")
     nlp = None
 
 def extract_metadata(text: str):

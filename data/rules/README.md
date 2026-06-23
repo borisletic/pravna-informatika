@@ -2,14 +2,16 @@
 
 ## Jedini izvor pravila: `environmental_rules.lrml`
 
-Pravila za krivična dela protiv životne sredine (KZ RS, čl. 260–268) modelovana su
-**isključivo** u LegalRuleML formatu u [environmental_rules.lrml](environmental_rules.lrml).
-Nema više `.drl` fajla — Drools je uklonjen. Rasuđivanje radi alat **dr-device**
-(CLIPS defeasible logic reasoner), kako traži specifikacija Celine 5.
+Pravila za krivična dela protiv životne sredine (KZ RS, **čl. 260–277**, cela
+Glava XXIV) modelovana su **isključivo** u LegalRuleML formatu u
+[environmental_rules.lrml](environmental_rules.lrml). Nema više `.drl` fajla —
+Drools je uklonjen. Rasuđivanje radi alat **dr-device** (CLIPS defeasible logic
+reasoner), kako traži specifikacija Celine 5.
 
 `environmental_rules.lrml` se generiše skriptom [build_environmental_lrml.py](build_environmental_lrml.py),
-koja drži 14 pravnih normi na jednom mestu i obezbeđuje konzistentnost (pravila,
-kazne, pobijanja). Ručno editovanje `.lrml`-a je moguće, ali je preporučeno menjati
+koja drži **39 pravnih normi** (čl. 260–277) na jednom mestu i obezbeđuje
+konzistentnost (pravila, kazne, pobijanja). Posle razbijanja „ILI" uslova
+dobija se 55 dr-device pravila + 14 negacija/override-a. Ručno editovanje `.lrml`-a je moguće, ali je preporučeno menjati
 skriptu pa regenerisati:
 
 ```
@@ -48,7 +50,7 @@ Koraci LRML→RuleML→CLIPS se rade jednom, pri startu aplikacije. Generisanje
 - **Izvedene relacije** (zaključci): `<ruleml:Rel>violates_260_3</ruleml:Rel>`.
 - **Disjunkcije (ILI)**: `dr-device.xsl` ne prevodi `<Or>` u telu pravila, pa se svaki
   „ILI" uslov **razbija na više pravila** sa istim zaključkom (kao u referentnom
-  primeru `ps220_3_a` / `ps220_3_b`). 14 normi → 26 pravila.
+  primeru `ps220_3_a` / `ps220_3_b`). 39 normi → 55 pravila.
 - **Kazne**: `lrml:PenaltyStatement` → `min_imprisonment` / `max_imprisonment` (meseci),
   povezane sa pravilima preko `lrml:ReparationStatement`.
 - **Pobijanje (defeasible)**: `lrml:OverrideStatement` čini teži oblik nadređenim

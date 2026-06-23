@@ -91,6 +91,69 @@ NORMS = [
 
     ("violates_268_1", (0, 12), "cl. 268 — Uskracivanje podataka o stanju zivotne sredine",
      [("f", "deniedEnvironmentalInfo", "true")]),
+
+    # ---- cl. 269-277 (zivotinje, sume, lov, ribolov) ----
+    ("violates_269_1", (0, 24), "cl. 269 st. 1 — Ubijanje i zlostavljanje zivotinja",
+     [("f", "killsOrAbusesAnimal", "true")]),
+    ("violates_269_2", (0, 36), "cl. 269 st. 2 — veci broj / posebno zasticena vrsta",
+     [("f", "killsOrAbusesAnimal", "true"),
+      ("or", [("f", "largerNumberOrProtectedAnimals", "true"), ("f", "protectedSpecies", "true")])]),
+    ("violates_269_3", (6, 36), "cl. 269 st. 3 — organizovanje borbi zivotinja",
+     [("f", "organizesAnimalFights", "true")]),
+
+    ("violates_270_1", (0, 24), "cl. 270 st. 1 — Prenosenje zaraznih bolesti (umisljaj)",
+     [("f", "spreadsContagiousDisease", "true"), ("f", "intent", "UMISLJAJ")]),
+    ("violates_270_3", (0, 36), "cl. 270 st. 3 — nastupilo uginuce / znatna steta",
+     [("f", "spreadsContagiousDisease", "true"), ("f", "causedAnimalDeathOrDamage", "true")]),
+    ("violates_270_4", (0, 12), "cl. 270 st. 4 — iz nehata",
+     [("f", "spreadsContagiousDisease", "true"), ("f", "intent", "NEHAT")]),
+
+    ("violates_271_1", (0, 12), "cl. 271 st. 1 — Nesavesno pruzanje veterinarske pomoci",
+     [("f", "negligentVetHelp", "true"), ("f", "intent", "UMISLJAJ")]),
+    ("violates_271_2", (0, 6), "cl. 271 st. 2 — iz nehata",
+     [("f", "negligentVetHelp", "true"), ("f", "intent", "NEHAT")]),
+
+    ("violates_272_1", (0, 12), "cl. 272 st. 1 — Proizvodnja stetnih sredstava za lecenje zivotinja",
+     [("f", "producesHarmfulVetProduct", "true"), ("f", "intent", "UMISLJAJ")]),
+    ("violates_272_2", (0, 24), "cl. 272 st. 2 — prouzrokovano uginuce / znatna steta",
+     [("f", "producesHarmfulVetProduct", "true"), ("f", "causedAnimalDeathOrDamage", "true")]),
+    ("violates_272_3", (0, 6), "cl. 272 st. 3 — iz nehata",
+     [("f", "producesHarmfulVetProduct", "true"), ("f", "intent", "NEHAT")]),
+
+    ("violates_273_1", (0, 24), "cl. 273 st. 1 — Zagadjivanje hrane i vode za zivotinje (umisljaj)",
+     [("f", "pollutesAnimalFoodWater", "true"), ("f", "intent", "UMISLJAJ")]),
+    ("violates_273_3", (0, 36), "cl. 273 st. 3 — prouzrokovano uginuce / znatna steta",
+     [("f", "pollutesAnimalFoodWater", "true"), ("f", "causedAnimalDeathOrDamage", "true")]),
+    ("violates_273_4", (0, 6), "cl. 273 st. 4 — iz nehata",
+     [("f", "pollutesAnimalFoodWater", "true"), ("f", "intent", "NEHAT")]),
+
+    ("violates_274_1", (0, 12), "cl. 274 st. 1 — Pustosenje suma",
+     [("f", "devastatesForest", "true")]),
+    ("violates_274_2", (3, 36), "cl. 274 st. 2 — u zasticenoj sumi / nacionalnom parku",
+     [("f", "devastatesForest", "true"), ("f", "protectedForest", "true")]),
+
+    ("violates_275_1", (0, 12), "cl. 275 st. 1 — Sumska kradja (preko 1 m3)",
+     [("f", "forestTheftOverOneM3", "true")]),
+    ("violates_275_2", (0, 36), "cl. 275 st. 2 — namera prodaje / preko 5 m3 / zasticena suma",
+     [("f", "forestTheftOverOneM3", "true"),
+      ("or", [("f", "intentToSellWood", "true"), ("f", "overFiveCubicMeters", "true"),
+              ("f", "protectedForest", "true")])]),
+
+    ("violates_276_1", (0, 6), "cl. 276 st. 1 — Nezakonit lov (lovostaj / zabranjeno podrucje)",
+     [("f", "illegalHuntingClosedSeason", "true")]),
+    ("violates_276_2", (0, 12), "cl. 276 st. 2 — lov na tudjem lovistu",
+     [("f", "huntingForeignGround", "true")]),
+    ("violates_276_3", (0, 24), "cl. 276 st. 3 — krupna divljac",
+     [("f", "huntingForeignGround", "true"), ("f", "largeGame", "true")]),
+    ("violates_276_4", (0, 36), "cl. 276 st. 4 — zabranjena divljac / masovno unistavanje",
+     [("f", "prohibitedGameOrMassDestruction", "true")]),
+
+    ("violates_277_1", (0, 6), "cl. 277 st. 1 — Nezakonit ribolov (lovostaj / zabranjene vode)",
+     [("f", "illegalFishingClosedSeason", "true")]),
+    ("violates_277_2", (0, 36), "cl. 277 st. 2 — eksploziv / struja / otrov / masovno",
+     [("or", [("f", "fishingHarmfulMeans", "true"), ("f", "usesExplosives", "true")])]),
+    ("violates_277_3", (0, 36), "cl. 277 st. 3 — veca bioloska vrednost / veca kolicina",
+     [("f", "fishingHighValueOrQuantity", "true")]),
 ]
 
 # ---- negacije / pobijanja (ne racunaju se u minimum od 10 pravila) ---------
@@ -101,6 +164,16 @@ NEGATIONS = [
     ("ps_n_r11",  "rule_n_r11",  "violates_266_2", "violates_266_1"),
     ("ps_n_r12a", "rule_n_r12a", "violates_266_5", "violates_266_1"),
     ("ps_n_r12b", "rule_n_r12b", "violates_266_5", "violates_266_2"),
+    # kvalifikovani / tezi oblici pobijaju blaze (cl. 269-277)
+    ("ps_n_269",  "rule_n_269",  "violates_269_2", "violates_269_1"),
+    ("ps_n_270",  "rule_n_270",  "violates_270_3", "violates_270_1"),
+    ("ps_n_272",  "rule_n_272",  "violates_272_2", "violates_272_1"),
+    ("ps_n_273",  "rule_n_273",  "violates_273_3", "violates_273_1"),
+    ("ps_n_274",  "rule_n_274",  "violates_274_2", "violates_274_1"),
+    ("ps_n_275",  "rule_n_275",  "violates_275_2", "violates_275_1"),
+    ("ps_n_2763", "rule_n_2763", "violates_276_3", "violates_276_2"),
+    ("ps_n_2764", "rule_n_2764", "violates_276_4", "violates_276_1"),
+    ("ps_n_277",  "rule_n_277",  "violates_277_2", "violates_277_1"),
 ]
 
 

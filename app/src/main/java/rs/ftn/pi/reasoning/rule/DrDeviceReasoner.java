@@ -81,7 +81,15 @@ public class DrDeviceReasoner implements Reasoner {
         for (String p : new String[]{"violatedEnvironmentalRegs", "failedToTakeProtectiveMeasures",
                 "unauthorizedConstruction", "damagedProtectionEquipment", "destroyedProtectedNaturalAsset",
                 "illegalSpeciesTraffic", "dangerousSubstanceAction", "officialPositionAbuse",
-                "organizesCrime", "unauthorizedNuclearFacility", "deniedEnvironmentalInfo"}) {
+                "organizesCrime", "unauthorizedNuclearFacility", "deniedEnvironmentalInfo",
+                // cl. 269-277
+                "killsOrAbusesAnimal", "largerNumberOrProtectedAnimals", "protectedSpecies",
+                "organizesAnimalFights", "spreadsContagiousDisease", "causedAnimalDeathOrDamage",
+                "negligentVetHelp", "producesHarmfulVetProduct", "pollutesAnimalFoodWater",
+                "devastatesForest", "protectedForest", "forestTheftOverOneM3", "intentToSellWood",
+                "overFiveCubicMeters", "illegalHuntingClosedSeason", "huntingForeignGround",
+                "largeGame", "prohibitedGameOrMassDestruction", "illegalFishingClosedSeason",
+                "fishingHarmfulMeans", "usesExplosives", "fishingHighValueOrQuantity"}) {
             PREDICATE_DEFAULTS.put(p, "false");
         }
     }
@@ -100,7 +108,32 @@ public class DrDeviceReasoner implements Reasoner {
             Map.entry("art_266__para_2", "Opasne materije sa zloupotrebom polozaja"),
             Map.entry("art_266__para_5", "Organizovanje vrsenja sa opasnim materijama"),
             Map.entry("art_267__para_1", "Nedozvoljena izgradnja nuklearnog postrojenja"),
-            Map.entry("art_268__para_1", "Uskracivanje podataka o stanju zivotne sredine")
+            Map.entry("art_268__para_1", "Uskracivanje podataka o stanju zivotne sredine"),
+            Map.entry("art_269__para_1", "Ubijanje i zlostavljanje zivotinja"),
+            Map.entry("art_269__para_2", "Ubijanje/zlostavljanje - veci broj ili zasticena vrsta"),
+            Map.entry("art_269__para_3", "Organizovanje borbi zivotinja"),
+            Map.entry("art_270__para_1", "Prenosenje zaraznih bolesti zivotinja/biljaka"),
+            Map.entry("art_270__para_3", "Zarazne bolesti - nastupila znatna steta"),
+            Map.entry("art_270__para_4", "Prenosenje zaraznih bolesti iz nehata"),
+            Map.entry("art_271__para_1", "Nesavesno pruzanje veterinarske pomoci"),
+            Map.entry("art_271__para_2", "Nesavesna veterinarska pomoc iz nehata"),
+            Map.entry("art_272__para_1", "Proizvodnja stetnih sredstava za lecenje zivotinja"),
+            Map.entry("art_272__para_2", "Stetna sredstva - prouzrokovana znatna steta"),
+            Map.entry("art_272__para_3", "Stetna sredstva iz nehata"),
+            Map.entry("art_273__para_1", "Zagadjivanje hrane i vode za zivotinje"),
+            Map.entry("art_273__para_3", "Zagadjivanje hrane/vode - znatna steta"),
+            Map.entry("art_273__para_4", "Zagadjivanje hrane/vode iz nehata"),
+            Map.entry("art_274__para_1", "Pustosenje suma"),
+            Map.entry("art_274__para_2", "Pustosenje zasticene sume / nacionalnog parka"),
+            Map.entry("art_275__para_1", "Sumska kradja"),
+            Map.entry("art_275__para_2", "Sumska kradja - kvalifikovani oblik"),
+            Map.entry("art_276__para_1", "Nezakonit lov (lovostaj/zabranjeno podrucje)"),
+            Map.entry("art_276__para_2", "Nezakonit lov na tudjem lovistu"),
+            Map.entry("art_276__para_3", "Nezakonit lov krupne divljaci"),
+            Map.entry("art_276__para_4", "Lov zabranjene divljaci / masovno unistavanje"),
+            Map.entry("art_277__para_1", "Nezakonit ribolov (lovostaj/zabranjene vode)"),
+            Map.entry("art_277__para_2", "Ribolov eksplozivom/strujom/otrovom"),
+            Map.entry("art_277__para_3", "Ribolov vece bioloske vrednosti/kolicine")
     );
 
     private final AppConfig appConfig;

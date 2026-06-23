@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+  <judgment name="presuda">
+    <meta>
+      <identification source="#sistem">
+        <FRBRWork>
+          <FRBRthis value="/akn/rs/judgment/pi/8eac102e/main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/8eac102e"/>
+          <FRBRalias name="caseNumber" value="PI-8EAC102E"/>
+          <FRBRalias name="court" value="Sistem za podrsku odlucivanju"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRcountry value="rs"/>
+        </FRBRWork>
+        <FRBRExpression>
+          <FRBRthis value="/akn/rs/judgment/pi/8eac102e/srp@/main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/8eac102e/srp@"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRlanguage language="srp"/>
+        </FRBRExpression>
+        <FRBRManifestation>
+          <FRBRthis value="/akn/rs/judgment/pi/8eac102e/srp@/main.xml"/>
+          <FRBRuri value="/akn/rs/judgment/pi/8eac102e/srp@.xml"/>
+          <FRBRdate date="2026-06-23" name="generation"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRformat value="application/xml"/>
+        </FRBRManifestation>
+      </identification>
+      <references source="#sistem">
+        <TLCOrganization eId="sistem" href="/akn/ontology/organization/rs/pi-sistem" showAs="Sistem za podrsku odlucivanju"/>
+        <TLCReference eId="kz" href="/akn/rs/act/2005/kz" showAs="Krivicni zakonik"/>
+      </references>
+    </meta>
+    <judgmentBody>
+      <introduction>
+        <p>Predmet broj PI-8EAC102E od dana 23.06.2026..</p>
+        <p></p>
+      </introduction>
+      <background>
+        <p>Na osnovu utvrdjenog cinjenicnog stanja:</p>
+        <p>substanceType = DRVO, overFiveCubicMeters = true, pollutionTarget = SUMA, forestTheftOverOneM3 = true, intent = UMISLJAJ</p>
+      </background>
+      <decision>
+        <p>Okrivljeni se oglasava krivim jer je prekrsio <ref href="/laws/kz#art_275">KZ čl. 275 st. 2</ref>.</p>
+        <p>Izrice se: <b>kazna zatvora u trajanju od 12 meseci</b></p>
+      </decision>
+      <motivation>
+        <p>dr-device (defeasible logika) je nad zadatim cinjenicama dokazao prekrsaj 1 odredbe KZ-a: KZ čl. 275 st. 2. Predlozeni raspon kazne zatvora: 0-36 meseci.</p>
+        <p>Pri odmeravanju kazne sud je imao u vidu sličnu sudsku praksu: Кж1-3069/11 — 3 meseci; Кж1 2104/10 — 0 meseci; Кзз 1035/2015 — 6 meseci; Kзз 106/2012 — 5 meseci; Кзз 1065/2015 — 2 meseci.</p>
+      </motivation>
+    </judgmentBody>
+  </judgment>
+</akomaNtoso>

@@ -192,7 +192,8 @@ public class CaseController {
         ReasoningService.CombinedResult result = reasoningService.reasonAll(cleaned);
 
         SentenceProposal proposal = buildSentenceProposal(sentenceType, sentenceMonths);
-        String xml = decisionGenerator.generate(cleaned, result.getRuleBasedResult(), proposal);
+        String xml = decisionGenerator.generate(cleaned, result.getRuleBasedResult(),
+                result.getCaseBasedResult(), proposal);
 
         // Sačuvaj fajl
         String id = "generated-" + System.currentTimeMillis();
@@ -230,7 +231,8 @@ public class CaseController {
                     entity.getSentenceType() != null ? entity.getSentenceType().name() : null,
                     entity.getSentenceMonths());
 
-            String xml = decisionGenerator.generate(facts, result.getRuleBasedResult(), proposal);
+            String xml = decisionGenerator.generate(facts, result.getRuleBasedResult(),
+                    result.getCaseBasedResult(), proposal);
 
             String genId = "generated-" + System.currentTimeMillis();
             java.nio.file.Path dir = java.nio.file.Paths.get(
