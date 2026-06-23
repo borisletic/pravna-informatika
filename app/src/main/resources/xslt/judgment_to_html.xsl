@@ -11,13 +11,13 @@
             <header class="judgment-header">
                 <div class="judgment-meta">
                     <span class="case-num">
-                        <xsl:value-of select="//akn:FRBRalias[@name='caseNumber']/@value"/>
+                        <xsl:value-of select="(//akn:FRBRalias[@name='caseNumber'])[1]/@value"/>
                     </span>
                     <span class="court">
-                        <xsl:value-of select="//akn:FRBRalias[@name='court']/@value"/>
+                        <xsl:value-of select="(//akn:FRBRalias[@name='court'])[1]/@value"/>
                     </span>
                     <span class="judgment-date">
-                        <xsl:value-of select="//akn:FRBRdate[@name='judgment']/@date"/>
+                        <xsl:value-of select="(//akn:FRBRdate[@name='judgment'])[1]/@date"/>
                     </span>
                 </div>
             </header>

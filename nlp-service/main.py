@@ -11,6 +11,7 @@ from typing import List, Optional, Any
 # Uvozimo naše ekstraktore
 from extractors.metadata_extractor import extract_metadata
 from extractors.fact_extractor import extract_facts
+from extractors.llm_extractor import extract_facts_llm
 
 app = FastAPI(
     title="Pravna Informatika - NLP Service",
@@ -79,10 +80,20 @@ def extract_all(request: ExtractionRequest):
         if request.options.includeMetadata:
             response_data.metadata = extract_metadata(request.text)
             
-        # 2. Ekstrakcija pravnih činjenica (ako je zahtevano opcijama)
+        # 2. Ekstrakcija pravnih činjenica: regex (precizno za brojeve/ključne reči)
+        #    + lokalni LLM (Ollama) za kontekstualne činjenice. LLM dopunjava ono
+        #    što regex ne uhvati; ako Ollama nije pokrenut, ostaje samo regex.
         if request.options.includeFacts:
-            response_data.facts = extract_facts(request.text)
-            
+            import os
+            facts = extract_facts(request.text)
+            if os.environ.get("NLP_DISABLE_LLM") != "1":
+                existing = {f.predicate for f in facts}
+                for lf in extract_facts_llm(request.text):
+                    if lf.predicate not in existing:
+                        facts.append(lf)
+                        existing.add(lf.predicate)
+            response_data.facts = facts
+
         return response_data
         
     except Exception as e:
@@ -102,31 +113,39 @@ class GenerateResponse(BaseModel):
 @app.post("/generate-decision", response_model=GenerateResponse)
 def generate_decision(request: GenerateRequest):
     """
-    Celina 9 — generisanje obrazloženja odluke jezičkim modelom (LLM), po ugledu
-    na postojeće presude. Aktivira se ako je postavljen OPENAI_API_KEY; u suprotnom
-    vraća available=false pa Java aplikacija koristi šablonski generator.
+    Celina 9 — generisanje obrazloženja odluke LOKALNIM jezičkim modelom (Ollama),
+    po ugledu na postojeće presude. Besplatno, bez API ključa. Ako Ollama nije
+    pokrenut, vraća available=false pa Java aplikacija koristi šablonski generator.
+
+    Konfiguracija: OLLAMA_URL (default http://localhost:11434), OLLAMA_MODEL (default mistral).
     """
     import os
-    key = os.environ.get("OPENAI_API_KEY")
-    if not key:
-        return GenerateResponse(available=False)
+    import httpx
+    url = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+    model = os.environ.get("OLLAMA_MODEL", "mistral")
+    system = ("Ti si sudija Republike Srbije. Pišeš obrazloženje presude za krivična dela "
+              "protiv životne sredine (KZ čl. 260-277), formalnim pravnim stilom, po ugledu "
+              "na postojeće presude. Vrati isključivo tekst obrazloženja (2-4 pasusa), bez naslova.")
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=key)
-        resp = client.chat.completions.create(
-            model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
-            messages=[
-                {"role": "system", "content":
-                    "Ti si sudija Republike Srbije. Pišeš obrazloženje presude za krivična dela "
-                    "protiv životne sredine (KZ čl. 260-277), formalnim pravnim stilom, po ugledu "
-                    "na postojeće presude. Vrati isključivo tekst obrazloženja (2-4 pasusa), bez naslova."},
-                {"role": "user", "content": request.prompt},
-            ],
-            temperature=0.4,
+        resp = httpx.post(
+            f"{url}/api/chat",
+            json={
+                "model": model,
+                "stream": False,
+                "options": {"temperature": 0.4},
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": request.prompt},
+                ],
+            },
+            timeout=httpx.Timeout(float(os.environ.get("OLLAMA_TIMEOUT", "180")), connect=2.0),
         )
-        return GenerateResponse(available=True, text=resp.choices[0].message.content.strip())
+        if resp.status_code != 200:
+            return GenerateResponse(available=False)
+        text = resp.json().get("message", {}).get("content", "").strip()
+        return GenerateResponse(available=bool(text), text=text or None)
     except Exception as e:
-        print(f"[ERROR] LLM generisanje nije uspelo: {e}")
+        print(f"[ERROR] Ollama generisanje nije uspelo: {e}")
         return GenerateResponse(available=False)
 
 
@@ -135,3 +154,10 @@ def generate_decision(request: GenerateRequest):
 def health_check():
     """Pomoćni endpoint za proveru zdravlja servisa."""
     return {"status": "healthy"}
+
+
+if __name__ == "__main__":
+    # Omogućava pokretanje preko `python main.py` (npr. iz autostart launcher-a).
+    import os
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=int(os.environ.get("NLP_PORT", "8000")))

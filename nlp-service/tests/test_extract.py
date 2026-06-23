@@ -9,6 +9,11 @@ Napomena: testovi rade i bez spaCy modela (regex-only predikati). Predikati koji
 zavise od spaCy (priorConviction, remediedDamage, imena sudija/stranaka) testiraju
 se samo ako je model dostupan.
 """
+import os
+# Testovi proveravaju regex ekstrakciju — LLM (Ollama) putanja se isključuje radi
+# brzine i determinizma.
+os.environ["NLP_DISABLE_LLM"] = "1"
+
 from fastapi.testclient import TestClient
 from main import app
 from extractors.fact_extractor import extract_facts, nlp as fact_nlp

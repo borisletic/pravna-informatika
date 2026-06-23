@@ -15,9 +15,12 @@ spacy
 # torch==2.3.0
 # sentencepiece==0.2.0
 
-# Celina 9 - generisanje obrazloženja odluke jezičkim modelom
-# (opciono; aktivira se kada je postavljen OPENAI_API_KEY)
-openai
+# LLM (lokalno, besplatno) — Celina 4 (ekstrakcija iz teksta) i Celina 9 (generisanje odluke)
+# Koristi se Ollama preko HTTP-a (httpx, ispod). Nije potreban API ključ.
+#   1) instaliraj Ollama: https://ollama.com
+#   2) povuci model:  ollama pull mistral   (ili llama3.2:3b / qwen2.5:3b za slabiji hardver)
+#   3) opciono podesi: OLLAMA_MODEL, OLLAMA_URL
+# httpx se koristi i u runtime-u (ne samo za testove).
 
 # Testiranje
 pytest==8.2.0

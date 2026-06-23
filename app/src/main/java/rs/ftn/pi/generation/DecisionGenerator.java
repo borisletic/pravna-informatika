@@ -20,7 +20,7 @@ import java.util.UUID;
  * Generisanje nove sudske odluke (Celina 9).
  *
  * Obrazloženje se piše „po ugledu na postojeće odluke":
- *  1. ako je dostupan LLM (NLP servis, OPENAI_API_KEY) — generiše ga jezički model
+ *  1. ako je dostupan lokalni LLM (NLP servis + Ollama) — generiše ga jezički model
  *     na osnovu činjenica, primenjenih članova i NAJSLIČNIJIH ranijih presuda (CBR);
  *  2. u suprotnom — šablonski tekst koji citira primenjeni član, rezultat rasuđivanja
  *     po pravilima i slične ranije slučajeve.
@@ -61,14 +61,16 @@ public class DecisionGenerator {
             sentenceText = humanSentence(selectedSentence);
         }
 
-        String description = facts.getDescription() != null ? facts.getDescription() : "";
+        String description = facts.getDescription() != null && !facts.getDescription().isBlank()
+                ? facts.getDescription()
+                : "Postupak je pokrenut na osnovu utvrđenog činjeničnog stanja.";
         List<SimilarCase> similar = cbrResult != null && cbrResult.getSimilarCases() != null
                 ? cbrResult.getSimilarCases() : List.of();
 
         // obrazloženje: LLM ako je dostupan, inače šablon (oba "po ugledu na postojeće odluke")
         String obrazlozenje = buildMotivation(facts, ruleResult, similar, selectedSentence, citation);
 
-        String factsSummary = summarizeFacts(facts);
+        String factsSummary = humanizeFacts(facts);
         String similarHtml = similarCasesText(similar);
 
         return """
@@ -112,7 +114,6 @@ public class DecisionGenerator {
                         <p>%s</p>
                       </introduction>
                       <background>
-                        <p>Na osnovu utvrdjenog cinjenicnog stanja:</p>
                         <p>%s</p>
                       </background>
                       <decision>
@@ -165,7 +166,7 @@ public class DecisionGenerator {
         if (facts.getDescription() != null && !facts.getDescription().isBlank()) {
             sb.append("Opis: ").append(facts.getDescription()).append("\n");
         }
-        sb.append("Utvrđene činjenice: ").append(summarizeFacts(facts)).append("\n");
+        sb.append("Utvrđene činjenice: ").append(humanizeFacts(facts)).append("\n");
         if (ruleResult != null && !ruleResult.getViolatedArticles().isEmpty()) {
             sb.append("Prekršeni članovi: ");
             List<String> cs = new ArrayList<>();
@@ -188,13 +189,133 @@ public class DecisionGenerator {
         return sb.toString();
     }
 
-    private String summarizeFacts(CaseFacts facts) {
-        if (facts.getFacts() == null || facts.getFacts().isEmpty()) return "nema strukturiranih činjenica";
-        List<String> parts = new ArrayList<>();
-        for (Map.Entry<String, Object> e : facts.getFacts().entrySet()) {
-            parts.add(e.getKey() + " = " + e.getValue());
+    // Boolean predikat -> pravna formulacija (uključuje se samo kada je tačno).
+    private static final Map<String, String> BOOL_PHRASES = Map.ofEntries(
+            Map.entry("violatedEnvironmentalRegs", "kršio propise o zaštiti životne sredine"),
+            Map.entry("failedToTakeProtectiveMeasures", "nije preduzeo propisane mere zaštite"),
+            Map.entry("unauthorizedConstruction", "dozvolio izgradnju odnosno stavljanje u pogon objekata koji zagađuju životnu sredinu"),
+            Map.entry("damagedProtectionEquipment", "oštetio objekte i uređaje za zaštitu životne sredine"),
+            Map.entry("destroyedProtectedNaturalAsset", "uništio odnosno oštetio posebno zaštićeno prirodno dobro"),
+            Map.entry("illegalSpeciesTraffic", "protivpravno iznosio zaštićenu biljnu odnosno životinjsku vrstu"),
+            Map.entry("dangerousSubstanceAction", "postupao sa opasnim materijama protivno propisima"),
+            Map.entry("officialPositionAbuse", "uz zloupotrebu službenog položaja"),
+            Map.entry("organizesCrime", "organizovao vršenje dela sa opasnim materijama"),
+            Map.entry("unauthorizedNuclearFacility", "nedozvoljeno gradio nuklearno postrojenje"),
+            Map.entry("deniedEnvironmentalInfo", "uskratio podatke o stanju životne sredine"),
+            Map.entry("killsOrAbusesAnimal", "ubio odnosno zlostavljao životinju"),
+            Map.entry("largerNumberOrProtectedAnimals", "u odnosu na veći broj životinja odnosno posebno zaštićenu životinjsku vrstu"),
+            Map.entry("protectedSpecies", "radi se o posebno zaštićenoj vrsti"),
+            Map.entry("organizesAnimalFights", "iz koristoljublja organizovao borbe između životinja"),
+            Map.entry("spreadsContagiousDisease", "nije postupao po merama za suzbijanje zaraznih bolesti životinja odnosno biljaka"),
+            Map.entry("causedAnimalDeathOrDamage", "usled čega je nastupilo uginuće životinja odnosno druga znatna šteta"),
+            Map.entry("negligentVetHelp", "nesavesno pružio veterinarsku pomoć"),
+            Map.entry("producesHarmfulVetProduct", "proizvodio odnosno stavljao u promet štetna sredstva za lečenje životinja"),
+            Map.entry("pollutesAnimalFoodWater", "zagadio hranu odnosno vodu za ishranu i napajanje životinja"),
+            Map.entry("devastatesForest", "protivno propisima vršio seču odnosno pustošenje šume"),
+            Map.entry("protectedForest", "u zaštićenoj šumi odnosno nacionalnom parku"),
+            Map.entry("forestTheftOverOneM3", "radi krađe oborio drvo u količini većoj od jednog kubnog metra"),
+            Map.entry("intentToSellWood", "u nameri da oboreno drvo proda"),
+            Map.entry("overFiveCubicMeters", "u količini većoj od pet kubnih metara"),
+            Map.entry("illegalHuntingClosedSeason", "lovio divljač za vreme lovostaja odnosno na području gde je lov zabranjen"),
+            Map.entry("huntingForeignGround", "neovlašćeno lovio na tuđem lovištu"),
+            Map.entry("largeGame", "u odnosu na krupnu divljač"),
+            Map.entry("prohibitedGameOrMassDestruction", "lovio divljač čiji je lov zabranjen odnosno sredstvima kojima se divljač masovno uništava"),
+            Map.entry("illegalFishingClosedSeason", "lovio ribu za vreme lovostaja odnosno u vodama u kojima je ribolov zabranjen"),
+            Map.entry("fishingHarmfulMeans", "ribu lovio sredstvima štetnim za razmnožavanje vodenih životinja"),
+            Map.entry("usesExplosives", "upotrebom eksploziva odnosno električne struje"),
+            Map.entry("fishingHighValueOrQuantity", "u odnosu na ribu veće biološke vrednosti odnosno u većoj količini"),
+            Map.entry("priorConviction", "ranije osuđivan"),
+            Map.entry("remediedDamage", "naknadno otklonio prouzrokovanu štetu")
+    );
+
+    private static String enumPhrase(String pred, String val) {
+        return switch (pred) {
+            case "intent" -> switch (val) {
+                case "UMISLJAJ" -> "delo je izvršeno sa umišljajem";
+                case "NEHAT" -> "delo je izvršeno iz nehata";
+                default -> null;
+            };
+            case "pollutionExtent" -> "VECA_MERA".equals(val) ? "zagađenje je izvršeno u većoj meri" : null;
+            case "pollutionScope" -> "SIRI_PROSTOR".equals(val) ? "zagađenje je nastalo na širem prostoru" : null;
+            case "ecologicalDamage" -> "VELIKIH_RAZMERA".equals(val)
+                    ? "prouzrokovana je ekološka šteta velikih razmera" : null;
+            case "damageExtent" -> "VELIKA".equals(val) ? "prouzrokovana šteta je velika" : null;
+            case "damageRemovalDifficulty" -> "ZAHTEVNO".equals(val)
+                    ? "otklanjanje štete zahteva duže vreme i velike troškove" : null;
+            case "perpetratorType" -> switch (val) {
+                case "SLUZBENO_LICE" -> "učinilac je postupao u svojstvu službenog lica";
+                case "ODGOVORNO_LICE" -> "učinilac je postupao u svojstvu odgovornog lica";
+                default -> null;
+            };
+            case "pollutionTarget" -> switch (val) {
+                case "VAZDUH" -> "predmet zagađenja je vazduh";
+                case "VODA" -> "predmet zagađenja je voda";
+                case "ZEMLJISTE", "TLO" -> "predmet zagađenja je zemljište";
+                case "SUMA" -> "delo je izvršeno u odnosu na šumu";
+                case "VISESTRUKO" -> "zagađeno je više činilaca životne sredine";
+                default -> null;
+            };
+            case "substanceType" -> switch (val) {
+                case "HEMIJSKI_OTPAD" -> "radi se o hemijskom otpadu";
+                case "RADIOAKTIVNI_OTPAD" -> "radi se o radioaktivnom otpadu";
+                case "KOMUNALNI_OTPAD" -> "radi se o komunalnom otpadu";
+                case "NAFTNI_DERIVATI" -> "radi se o naftnim derivatima";
+                case "OPASNE_MATERIJE" -> "radi se o opasnim materijama";
+                case "DRVO" -> "predmet dela je drvna masa";
+                case "ZIVOTINJE_RIBE" -> "predmet dela su životinje odnosno ribe";
+                default -> null;
+            };
+            default -> null;
+        };
+    }
+
+    /** Pretvara strukturirane činjenice u čitljivu pravnu formulaciju (Celina 9). */
+    private String humanizeFacts(CaseFacts facts) {
+        if (facts.getFacts() == null || facts.getFacts().isEmpty()) {
+            return "U postupku nije utvrđeno strukturirano činjenično stanje.";
         }
-        return String.join(", ", parts);
+        List<String> num = new ArrayList<>();   // numeričke
+        List<String> phrases = new ArrayList<>();
+        for (Map.Entry<String, Object> e : facts.getFacts().entrySet()) {
+            String pred = e.getKey();
+            Object v = e.getValue();
+            if (v == null) continue;
+            String s = v.toString().trim();
+            if (s.isEmpty()) continue;
+
+            if (isTrue(v)) {
+                String ph = BOOL_PHRASES.get(pred);
+                if (ph != null) phrases.add(ph);
+            } else if ("substanceQuantityM3".equals(pred)) {
+                num.add("količina materije iznosi " + stripDot(s) + " m³");
+            } else if ("forestAreaHa".equals(pred)) {
+                num.add("zahvaćena površina iznosi " + stripDot(s) + " ha");
+            } else if (!isFalse(v)) {
+                String ph = enumPhrase(pred, s.toUpperCase());
+                if (ph != null) phrases.add(ph);
+            }
+        }
+        phrases.addAll(num);
+        if (phrases.isEmpty()) {
+            return "U postupku nije utvrđeno relevantno činjenično stanje za primenu inkriminacija iz Glave XXIV KZ.";
+        }
+        String joined = String.join(", ", phrases);
+        String sentence = "Utvrđeno je da je okrivljeni " + joined + ".";
+        return sentence.substring(0, 1).toUpperCase() + sentence.substring(1);
+    }
+
+    private static boolean isTrue(Object v) {
+        return (v instanceof Boolean b && b) || "true".equalsIgnoreCase(String.valueOf(v))
+                || "DA".equalsIgnoreCase(String.valueOf(v));
+    }
+
+    private static boolean isFalse(Object v) {
+        return (v instanceof Boolean b && !b) || "false".equalsIgnoreCase(String.valueOf(v))
+                || "NE".equalsIgnoreCase(String.valueOf(v));
+    }
+
+    private static String stripDot(String s) {
+        return s.endsWith(".0") ? s.substring(0, s.length() - 2) : s;
     }
 
     private String similarCasesText(List<SimilarCase> similar) {

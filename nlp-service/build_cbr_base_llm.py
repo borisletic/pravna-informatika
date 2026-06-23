@@ -2,7 +2,7 @@
 build_cbr_base_llm.py
 VLASNIK: Član 2
 
-Ova skripta koristi OpenAI isključivo OFFLINE za kreiranje najkvalitetnije moguće
+Ova skripta koristi lokalni LLM (Ollama) isključivo OFFLINE za kreiranje najkvalitetnije moguće
 CBR baze (cbr_cases.csv). 
 Implementirana je STROGA 'WHITELIST' NORMALIZACIJA koja blokira svaku LLM halucinaciju,
 svodi izlaz na dogovorene enum vrednosti, i strogo filtrira prekršene članove
@@ -13,12 +13,13 @@ import csv
 import json
 import re
 import xml.etree.ElementTree as ET
-from openai import OpenAI
+import httpx
 
 # =====================================================================
-# KONFIGURACIJA
+# KONFIGURACIJA (lokalni Ollama — bez API ključa, bez troška)
 # =====================================================================
-client = OpenAI(api_key=API_KEY)
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "mistral")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Putanje usklađene sa arhitekturom
@@ -70,24 +71,32 @@ Vrati ISKLJUČIVO validan JSON.
 """
 
 def extract_with_llm(text):
-    """Šalje tekst OpenAI-u i vraća sirovi parsirani rečnik."""
+    """Šalje tekst lokalnom Ollama modelu i vraća sirovi parsirani rečnik."""
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": f"Tekst presude:\n{text[:12000]}"}
-            ],
-            response_format={"type": "json_object"},
-            temperature=0.0
+        resp = httpx.post(
+            f"{OLLAMA_URL}/api/chat",
+            json={
+                "model": OLLAMA_MODEL,
+                "format": "json",
+                "stream": False,
+                "options": {"temperature": 0.0},
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": f"Tekst presude:\n{text[:12000]}"},
+                ],
+            },
+            timeout=httpx.Timeout(180.0, connect=2.0),
         )
-        return json.loads(response.choices[0].message.content)
+        if resp.status_code != 200:
+            print(f"  [GREŠKA LLM] Ollama HTTP {resp.status_code}")
+            return {}
+        return json.loads(resp.json().get("message", {}).get("content", "{}"))
     except Exception as e:
-        print(f"  [GREŠKA LLM] {str(e)}")
+        print(f"  [GREŠKA LLM] {str(e)} — pokreni: 'ollama pull {OLLAMA_MODEL}' pa 'ollama serve'")
         return {}
 
 def get_text_from_xml(xml_path):
-    """Vadi sirovi tekst iz Akoma Ntoso XML-a."""
+    """Vadi sirovi tekst iz Akoma Ntoso XML-a (itertext hvata i tekst u <ref>)."""
     try:
         tree = ET.parse(xml_path)
         root = tree.getroot()
@@ -95,7 +104,7 @@ def get_text_from_xml(xml_path):
         paragraphs = root.findall('.//akn:p', namespaces)
         if not paragraphs:
             paragraphs = root.findall('.//p')
-        return " ".join([p.text.strip() for p in paragraphs if p.text])
+        return " ".join("".join(p.itertext()).strip() for p in paragraphs if "".join(p.itertext()).strip())
     except Exception as e:
         print(f"  [GREŠKA XML] Ne mogu parsirati fajl: {str(e)}")
         return ""

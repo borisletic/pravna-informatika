@@ -53,6 +53,17 @@ app:
     enabled: ${DR_DEVICE_ENABLED:true}
     home: ${DR_DEVICE_HOME:./dr-device}
     timeout-seconds: 90
+  # Jedan klik "Run" u IntelliJ-u podiže i Ollama (LLM) i Python NLP servis.
+  # Ugasi (enabled=false) ako želiš da ih pokrećeš ručno / u produkciji.
+  autostart:
+    enabled: ${AUTOSTART:true}
+    ollama: true
+    ollama-model: ${OLLAMA_MODEL:mistral}
+    ollama-bin: ${OLLAMA_BIN:ollama}
+    nlp: true
+    nlp-dir: ${NLP_DIR:./nlp-service}
+    python: ${PYTHON_BIN:python}
+    nlp-port: 8000
 
 logging:
   level:

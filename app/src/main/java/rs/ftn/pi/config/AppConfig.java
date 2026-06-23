@@ -15,6 +15,7 @@ public class AppConfig {
     private Nlp nlp = new Nlp();
     private Reasoning reasoning = new Reasoning();
     private DrDevice drDevice = new DrDevice();
+    private Autostart autostart = new Autostart();
 
     @Data
     public static class Nlp {
@@ -40,6 +41,30 @@ public class AppConfig {
         private String home = "./dr-device";
         /** Maksimalno trajanje jednog pokretanja reasonera. */
         private int timeoutSeconds = 90;
+    }
+
+    /**
+     * Automatsko pokretanje pratećih lokalnih servisa pri startu aplikacije
+     * (jedan klik „Run" u IntelliJ-u pokreće Ollama + NLP servis + app).
+     */
+    @Data
+    public static class Autostart {
+        /** Master prekidač. Ugasi (false) za produkciju / ručno pokretanje. */
+        private boolean enabled = true;
+        /** Pokreni `ollama serve` ako već ne radi. */
+        private boolean ollama = true;
+        /** Model koji se obezbeđuje (`ollama pull`) u pozadini. */
+        private String ollamaModel = "mistral";
+        /** Putanja do ollama izvršne datoteke (na PATH-u: "ollama"). */
+        private String ollamaBin = "ollama";
+        /** Pokreni Python NLP servis (uvicorn) ako već ne radi. */
+        private boolean nlp = true;
+        /** Direktorijum NLP servisa; resolver probava i ./nlp-service i ../nlp-service. */
+        private String nlpDir = "./nlp-service";
+        /** Python izvršna datoteka (na PATH-u: "python"). */
+        private String python = "python";
+        /** Port NLP servisa. */
+        private int nlpPort = 8000;
     }
 
     @Bean

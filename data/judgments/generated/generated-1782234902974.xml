@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+  <judgment name="presuda">
+    <meta>
+      <identification source="#sistem">
+        <FRBRWork>
+          <FRBRthis value="/akn/rs/judgment/pi/73aba0e4/main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/73aba0e4"/>
+          <FRBRalias name="caseNumber" value="PI-73ABA0E4"/>
+          <FRBRalias name="court" value="Sistem za podrsku odlucivanju"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRcountry value="rs"/>
+        </FRBRWork>
+        <FRBRExpression>
+          <FRBRthis value="/akn/rs/judgment/pi/73aba0e4/srp@/main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/73aba0e4/srp@"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRlanguage language="srp"/>
+        </FRBRExpression>
+        <FRBRManifestation>
+          <FRBRthis value="/akn/rs/judgment/pi/73aba0e4/srp@/main.xml"/>
+          <FRBRuri value="/akn/rs/judgment/pi/73aba0e4/srp@.xml"/>
+          <FRBRdate date="2026-06-23" name="generation"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRformat value="application/xml"/>
+        </FRBRManifestation>
+      </identification>
+      <references source="#sistem">
+        <TLCOrganization eId="sistem" href="/akn/ontology/organization/rs/pi-sistem" showAs="Sistem za podrsku odlucivanju"/>
+        <TLCReference eId="kz" href="/akn/rs/act/2005/kz" showAs="Krivicni zakonik"/>
+      </references>
+    </meta>
+    <judgmentBody>
+      <introduction>
+        <p>Predmet broj PI-73ABA0E4 od dana 23.06.2026..</p>
+        <p></p>
+      </introduction>
+      <background>
+        <p>Na osnovu utvrdjenog cinjenicnog stanja:</p>
+        <p>dangerousSubstanceAction = true, pollutesAnimalFoodWater = true, fishingHarmfulMeans = true, illegalHuntingClosedSeason = true, violatedEnvironmentalRegs = true, perpetratorType = OBICAN, pollutionExtent = VECA_MERA, damageRemovalDifficulty = ZAHTEVNO, officialPositionAbuse = true, failedToTakeProtectiveMeasures = true, pollutionScope = SIRI_PROSTOR, unauthorizedConstruction = true, causedAnimalDeathOrDamage = true, ecologicalDamage = VELIKIH_RAZMERA, illegalFishingClosedSeason = true, organizesAnimalFights = true, killsOrAbusesAnimal = true, largerNumberOrProtectedAnimals = true</p>
+      </background>
+      <decision>
+        <p>Okrivljeni se oglasava krivim jer je prekrsio <ref href="/laws/kz#art_266">KZ čl. 266 st. 2</ref>.</p>
+        <p>Izrice se: <b>kazna zatvora u trajanju od 51 meseci</b></p>
+      </decision>
+      <motivation>
+        <p>dr-device (defeasible logika) je nad zadatim cinjenicama dokazao prekrsaj 6 odredbi KZ-a: KZ čl. 266 st. 2, KZ čl. 269 st. 2, KZ čl. 269 st. 3, KZ čl. 273 st. 3, KZ čl. 276 st. 1, KZ čl. 277 st. 2. Predlozeni raspon kazne zatvora: 6-96 meseci.</p>
+        <p>Pri odmeravanju kazne sud je imao u vidu sličnu sudsku praksu: USER-3 — 51 meseci.</p>
+      </motivation>
+    </judgmentBody>
+  </judgment>
+</akomaNtoso>

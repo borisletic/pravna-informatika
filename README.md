@@ -29,19 +29,31 @@ GRANT ALL PRIVILEGES ON DATABASE pravna_informatika TO pi_user;
 \q
 ```
 
-### Pokretanje aplikacije
-```bash
-# 1. NLP servis (terminal 1)
-cd nlp-service
-python -m venv venv
-source venv/bin/activate    # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+### Pokretanje — JEDAN KLIK (IntelliJ)
 
-# 2. Spring app (terminal 2)
-cd app
-mvn spring-boot:run
-# Otvori http://localhost:8080
+Aplikacija pri startu sama podiže **Ollama** (lokalni LLM) i **Python NLP servis**,
+pa je dovoljno pokrenuti Spring app:
+
+1. **Jednokratni setup** (samo prvi put):
+   ```bash
+   # PostgreSQL (vidi gore) + Ollama + Python zavisnosti
+   #  - instaliraj Ollama: https://ollama.com   (model se povlači automatski pri prvom startu)
+   pip install -r nlp-service/requirements.txt   # fastapi, uvicorn, httpx (spaCy je opcioni)
+   ```
+2. U IntelliJ-u izaberi run konfiguraciju **„Pravna informatika (full stack)"** i klikni ▶ Run.
+   - Pokreće `PiApplication`, a ona automatski startuje `ollama serve` (+ `ollama pull mistral`
+     u pozadini) i NLP servis (`uvicorn`) ako već ne rade. Otvori <http://localhost:8080>.
+   - Pri zaustavljanju (Stop), prateći procesi koje je app pokrenuo se gase.
+
+> Autostart se isključuje sa `app.autostart.enabled=false` (ili env `AUTOSTART=false`) ako
+> želiš ručno pokretanje. Model se bira sa `OLLAMA_MODEL` (npr. `llama3.2:3b` za slabiji hardver).
+
+### Pokretanje — ručno (alternativa)
+```bash
+# 1. (opciono, ako je autostart isključen) NLP servis
+cd nlp-service && pip install -r requirements.txt && uvicorn main:app --port 8000
+# 2. Spring app
+cd app && mvn spring-boot:run    # http://localhost:8080
 ```
 
 ## Struktura repozitorijuma
@@ -74,4 +86,10 @@ Pre nego što počnete da radite, **PROČITAJTE**:
 
 ## Status implementacije
 
-Svaka celina je trenutno SKELET sa `TODO` markerima. Pretražite repo sa `grep -r "TODO"` da nađete svoje delove.
+Sve celine (1–9) su implementirane:
+- **Celina 1/3** — Akoma Ntoso zakon + LegalRuleML pravila (čl. 260–277).
+- **Celina 5** — rasuđivanje po pravilima alatom **dr-device** (CLIPS), 39 normi / 55 pravila.
+- **Celina 2** — anotirane sudske odluke (37 u domenu, van-domena izmešteno u `data/judgments/_excluded/`).
+- **Celina 4** — NLP ekstrakcija (regex + lokalni LLM/Ollama) + ručno ažuriranje izvučenih podataka.
+- **Celina 6** — CBR (funkcije sličnosti iz rečnika + kNN retrieval).
+- **Celina 7/8/9** — pregled + navigacija, kombinovano rasuđivanje, generisanje odluka (lokalni LLM, fallback šablon).

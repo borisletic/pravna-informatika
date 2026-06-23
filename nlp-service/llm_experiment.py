@@ -1,17 +1,18 @@
 import os
 import json
 import time
-from openai import OpenAI
+import httpx
 import xml.etree.ElementTree as ET
 
 # Uvozimo naš trenutni (hibridni) ekstraktor za poređenje
 from extractors.fact_extractor import extract_facts as extract_facts_regex
 
 # =====================================================================
-# 1. LLM KONFIGURACIJA I PROMPT
+# 1. LLM KONFIGURACIJA I PROMPT (lokalni Ollama — bez API ključa)
 # =====================================================================
 
-client = OpenAI(api_key=API_KEY)
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "mistral")
 
 SYSTEM_PROMPT = """
 Ti si ekspertni pravni asistent (NLP sistem) specijalizovan za krivično pravo Republike Srbije, posebno za ekološka krivična dela.
@@ -35,23 +36,27 @@ Vrati isključivo validan JSON objekat gde su ključevi nazivi činjenica, a vre
 """
 
 def extract_facts_llm(text: str):
-    """Šalje tekst na OpenAI API i vraća parsiran JSON."""
-    if API_KEY.startswith("sk-...") or not API_KEY.startswith("sk-"):
-        return {"Greska": "Nisi uneo validan API ključ u liniji 13!"}
-        
+    """Šalje tekst lokalnom Ollama modelu i vraća parsiran JSON."""
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": f"Tekst presude:\n{text[:10000]}"}
-            ],
-            response_format={ "type": "json_object" },
-            temperature=0.0
+        resp = httpx.post(
+            f"{OLLAMA_URL}/api/chat",
+            json={
+                "model": OLLAMA_MODEL,
+                "format": "json",
+                "stream": False,
+                "options": {"temperature": 0.0},
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": f"Tekst presude:\n{text[:10000]}"},
+                ],
+            },
+            timeout=httpx.Timeout(180.0, connect=2.0),
         )
-        return json.loads(response.choices[0].message.content)
+        if resp.status_code != 200:
+            return {"error": f"Ollama HTTP {resp.status_code}"}
+        return json.loads(resp.json().get("message", {}).get("content", "{}"))
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": str(e), "hint": "Pokreni Ollama: 'ollama pull mistral' pa 'ollama serve'"}
 
 # =====================================================================
 # 2. POMOĆNE FUNKCIJE I IZVRŠENJE EKSPERIMENTA
@@ -102,7 +107,7 @@ def run_experiment():
     print("\n")
 
     # 2. LLM metod
-    print("--- 2. POKREĆEM LLM METOD (GPT) ---")
+    print(f"--- 2. POKREĆEM LLM METOD (Ollama: {OLLAMA_MODEL}) ---")
     start_time = time.time()
     llm_dict = extract_facts_llm(text)
     llm_time = time.time() - start_time
