@@ -1,0 +1,27 @@
+# Generisani / runtime artefakti dr-device-a (regenerise ih DrDeviceReasoner pri
+# svakom startu / pokretanju). Distribucija (CLIPSDOS/, *-source/, XSL/, bin/) se cuva.
+
+# pravila generisana iz ../data/rules/environmental_rules.lrml
+rulebase.ruleml
+rulebase.clp
+rulebase.lrml
+run-env.clp
+
+# kompajlirani CLIPS artefakti
+defeasible-r-device-*.clp
+defeasible-r-device-*-comp.bat
+r-device-compiled-*.clp
+rulebase-comp.bat
+
+# cinjenice slucaja + rezultati (po pokretanju)
+facts.rdf
+facts.n3
+export.rdf
+proof.ruleml
+rulebase.log
+run_out.txt
+run_err.txt
+
+# markeri
+Clips
+RuleML

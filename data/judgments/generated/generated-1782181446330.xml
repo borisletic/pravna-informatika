@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+  <judgment name="presuda">
+    <meta>
+      <identification source="#sud">
+        <FRBRWork>
+          <FRBRthis value="/akn/rs/judgment/pi/33727db1/!main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/33727db1"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sud"/>
+          <FRBRcountry value="rs"/>
+        </FRBRWork>
+        <FRBRExpression>
+          <FRBRthis value="/akn/rs/judgment/pi/33727db1/srp@2026-06-23/!main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/33727db1/srp@2026-06-23"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sud"/>
+          <FRBRlanguage language="srp"/>
+        </FRBRExpression>
+        <FRBRManifestation>
+          <FRBRthis value="/akn/rs/judgment/pi/33727db1/srp@2026-06-23/!main.xml"/>
+          <FRBRuri value="/akn/rs/judgment/pi/33727db1/srp@2026-06-23.xml"/>
+          <FRBRdate date="2026-06-23" name="generation"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRformat value="application/xml"/>
+        </FRBRManifestation>
+        <FRBRalias name="caseNumber" value="PI-33727DB1"/>
+             <FRBRalias name="court" value="Sistem za automatsko rasuđivanje"/>
+      </identification>
+    </meta>
+    <judgmentBody>
+      <introduction>
+        <p>Osnovni sud u Beogradu je razmatrao slučaj broj <ref href="#case">PI-33727DB1</ref> od dana 23.06.2026..</p>
+            <p></p>
+      </introduction>
+      <background>
+        <p>Utvrđeno je da je učinilac kršio propise o zaštiti životne sredine.</p>
+        <p>Primenjeni član: <ref href="#art_265__para_1">art_265__para_1</ref></p>
+        <p>(1) Ko uništi ili ošteti posebno zaštićeno prirodno dobro, kazniće se zatvorom od šest meseci do pet godina.</p>
+      </background>
+      <motivation>
+        <p>dr-device (defeasible logika) je nad zadatim cinjenicama dokazao prekrsaj 2 odredbi KZ-a: KZ čl. 265 st. 1, KZ čl. 266 st. 5. Predlozeni raspon kazne zatvora: 6-120 meseci.</p>
+      </motivation>
+      <decision>
+        <p>Sud izriče sledeću odluku: <b>ZATVOR u trajanju od 63 meseci</b></p>
+      </decision>
+    </judgmentBody>
+  </judgment>
+</akomaNtoso>

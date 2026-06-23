@@ -94,21 +94,12 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-engine</artifactId>
-            <version>8.44.0.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-mvel</artifactId>
-            <version>8.44.0.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kie</groupId>
-            <artifactId>kie-internal</artifactId>
-            <version>8.44.0.Final</version>
-        </dependency>
+        <!--
+            Celina 5 — rasudjivanje po pravilima koristi alat dr-device (CLIPS),
+            koji se poziva kao spoljni proces (vidi DrDeviceReasoner). Pravila se
+            iz LegalRuleML-a u DR-DEVICE RuleML i CLIPS prevode preko Saxon-HE
+            (vec prisutan iznad). Drools se vise NE koristi.
+        -->
 
         <!--
             TODO Član 2: Dodati jColibri zavisnost.

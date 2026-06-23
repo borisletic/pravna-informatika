@@ -1,7 +1,10 @@
 # app/libs/
 
 Mesto za JAR fajlove koji nisu na Maven Central:
-- `dr-device.jar` - **Član 1**, za Celinu 5
+- ~~`dr-device.jar` - **Član 1**, za Celinu 5~~ — **NIJE potreban**. dr-device nije
+  Java biblioteka nego CLIPS sistem; cela distribucija je u `dr-device/` u korenu
+  repozitorijuma i poziva se kao spoljni proces (vidi `DrDeviceReasoner` i
+  `data/rules/README.md`). Prevod LegalRuleML→RuleML→CLIPS radi Saxon-HE (Maven).
 - `jcolibri2.jar` (i tranzitivne) - **Član 2**, za Celinu 6
 
 Ovi JAR-ovi se referenciraju kao `system` scope u `pom.xml`.

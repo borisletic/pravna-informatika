@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+  <judgment name="presuda">
+    <meta>
+      <identification source="#sud">
+        <FRBRWork>
+          <FRBRthis value="/akn/rs/judgment/pi/cdd497a8/!main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/cdd497a8"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sud"/>
+          <FRBRcountry value="rs"/>
+        </FRBRWork>
+        <FRBRExpression>
+          <FRBRthis value="/akn/rs/judgment/pi/cdd497a8/srp@2026-06-23/!main"/>
+          <FRBRuri value="/akn/rs/judgment/pi/cdd497a8/srp@2026-06-23"/>
+          <FRBRdate date="2026-06-23" name="judgment"/>
+          <FRBRauthor href="#sud"/>
+          <FRBRlanguage language="srp"/>
+        </FRBRExpression>
+        <FRBRManifestation>
+          <FRBRthis value="/akn/rs/judgment/pi/cdd497a8/srp@2026-06-23/!main.xml"/>
+          <FRBRuri value="/akn/rs/judgment/pi/cdd497a8/srp@2026-06-23.xml"/>
+          <FRBRdate date="2026-06-23" name="generation"/>
+          <FRBRauthor href="#sistem"/>
+          <FRBRformat value="application/xml"/>
+        </FRBRManifestation>
+        <FRBRalias name="caseNumber" value="PI-CDD497A8"/>
+             <FRBRalias name="court" value="Sistem za automatsko rasuđivanje"/>
+      </identification>
+    </meta>
+    <judgmentBody>
+      <introduction>
+        <p>Osnovni sud u Beogradu je razmatrao slučaj broj <ref href="#case">PI-CDD497A8</ref> od dana 23.06.2026..</p>
+            <p></p>
+      </introduction>
+      <background>
+        <p>Utvrđeno je da je učinilac kršio propise o zaštiti životne sredine.</p>
+        <p>Primenjeni član: <ref href="#art_263__para_1">art_263__para_1</ref></p>
+        <p>(1) Ko ošteti, uništi, ukloni ili na drugi način učini neupotrebljivim objekte ili uređaje za zaštitu životne sredine, kazniće se zatvorom do tri godine.</p>
+      </background>
+      <motivation>
+        <p>dr-device (defeasible logika) je nad zadatim cinjenicama dokazao prekrsaj 2 odredbi KZ-a: KZ čl. 263 st. 1, KZ čl. 266 st. 5. Predlozeni raspon kazne zatvora: 36-120 meseci.</p>
+      </motivation>
+      <decision>
+        <p>Sud izriče sledeću odluku: <b>ZATVOR u trajanju od 78 meseci</b></p>
+      </decision>
+    </judgmentBody>
+  </judgment>
+</akomaNtoso>

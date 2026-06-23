@@ -14,6 +14,7 @@ public class AppConfig {
     private String dataDir;
     private Nlp nlp = new Nlp();
     private Reasoning reasoning = new Reasoning();
+    private DrDevice drDevice = new DrDevice();
 
     @Data
     public static class Nlp {
@@ -26,6 +27,19 @@ public class AppConfig {
         private String rulesFile;
         private String casesFile;
         private String predicateDict;
+    }
+
+    /**
+     * Konfiguracija za dr-device (CLIPS) rule reasoner — Celina 5.
+     */
+    @Data
+    public static class DrDevice {
+        /** Da li je dr-device rasudjivanje ukljuceno (ako ne, koristi se mock). */
+        private boolean enabled = true;
+        /** Putanja do dr-device distribucije (sadrzi CLIPSDOS\, DR-DEVICE-source\, ...). */
+        private String home = "./dr-device";
+        /** Maksimalno trajanje jednog pokretanja reasonera. */
+        private int timeoutSeconds = 90;
     }
 
     @Bean

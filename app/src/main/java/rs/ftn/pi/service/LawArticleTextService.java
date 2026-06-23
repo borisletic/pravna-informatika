@@ -26,7 +26,7 @@ import java.util.stream.Stream;
  * Servis koji pri startu aplikacije učitava kz.xml (i sve ostale zakone iz data/laws/)
  * i indeksira sve paragraphs i articles po njihovom eId atributu.
  *
- * Koristi se u RuleReasoner-u da bi rezultat rasuđivanja sadržao stvarni tekst
+ * Koristi se u DrDeviceReasoner-u da bi rezultat rasuđivanja sadržao stvarni tekst
  * prekršenog člana, ne placeholder.
  *
  * VLASNIK: Član 1 (Legal Modeling)
@@ -49,7 +49,7 @@ public class LawArticleTextService {
     public void init() {
         Path lawsDir = Paths.get(appConfig.getDataDir(), "laws");
         if (!Files.exists(lawsDir)) {
-            log.warn("LawArticleTextService: data/laws/ ne postoji ({}) - RuleReasoner će prikazati '(tekst nedostupan)'", lawsDir);
+            log.warn("LawArticleTextService: data/laws/ ne postoji ({}) - reasoner će prikazati '(tekst nedostupan)'", lawsDir);
             return;
         }
 

@@ -1,714 +1,1201 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Pravila za rasuđivanje u oblasti krivičnih dela protiv životne sredine.
-  KZ Republike Srbije, čl. 260-268.
-
-  VLASNIK: Član 1 (Legal Modeling).
-  CELINA: 3.
-
-  STRATEGIJA: Strict modus ponens (jednostavna implikacija).
-  Sva pravila su LegalRuleML 1.0 PrescriptiveStatement.
-  Defeasible varijante (sa Overrides i Defeaters) - kasnije, ako bude vremena.
-
-  STRUKTURA PRAVILA:
-    R1-R4   : čl. 260 (Zagađenje životne sredine - osnovni i kvalifikovani oblici)
-    R5      : čl. 261 (Nepreduzimanje mera zaštite)
-    R6      : čl. 262 (Protivpravna izgradnja)
-    R7      : čl. 263 (Oštećenje objekata zaštite)
-    R8-R9   : čl. 265 (Uništenje zaštićenog prirodnog dobra)
-    R10-R12 : čl. 266 (Opasne materije)
-    R13     : čl. 267 (Nuklearna postrojenja)
-    R14     : čl. 268 (Uskraćivanje informacija)
-
-  Predikati: data/schemas/predicate_dictionary.yaml v0.2.0
-  Akoma Ntoso reference: data/laws/kz.xml
+  Pravila za krivicna dela protiv zivotne sredine (KZ RS, cl. 260-268).
+  DR-DEVICE LegalRuleML dijalekt. GENERISANO iz build_environmental_lrml.py.
+  Celina 3 (predstavljanje) + Celina 5 (rasudjivanje alatom dr-device).
+  14 pravnih normi (cl. 260-268); ILI-uslovi su razbijeni na vise pravila.
 -->
 <lrml:LegalRuleML
-    xmlns:lrml="http://docs.oasis-open.org/legalruleml/ns/v1.0/"
-    xmlns:ruleml="http://www.ruleml.org/spec"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-  <!-- ============================================================ -->
-  <!-- ASOCIJACIJE: vezuju pravila sa eId članova iz kz.xml         -->
-  <!-- ============================================================ -->
-  <lrml:Associations>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_260__para_1"/>
-      <lrml:toTarget keyref="#rule_R1"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_260__para_2"/>
-      <lrml:toTarget keyref="#rule_R2"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_260__para_3"/>
-      <lrml:toTarget keyref="#rule_R3"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_260__para_4"/>
-      <lrml:toTarget keyref="#rule_R4"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_261__para_1"/>
-      <lrml:toTarget keyref="#rule_R5"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_262__para_1"/>
-      <lrml:toTarget keyref="#rule_R6"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_263__para_1"/>
-      <lrml:toTarget keyref="#rule_R7"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_265__para_1"/>
-      <lrml:toTarget keyref="#rule_R8"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_265__para_3"/>
-      <lrml:toTarget keyref="#rule_R9"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_266__para_1"/>
-      <lrml:toTarget keyref="#rule_R10"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_266__para_2"/>
-      <lrml:toTarget keyref="#rule_R11"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_266__para_5"/>
-      <lrml:toTarget keyref="#rule_R12"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_267__para_1"/>
-      <lrml:toTarget keyref="#rule_R13"/>
-    </lrml:Association>
-    <lrml:Association>
-      <lrml:appliesSource keyref="/akn/rs/act/2005/kz#art_268__para_1"/>
-      <lrml:toTarget keyref="#rule_R14"/>
-    </lrml:Association>
-  </lrml:Associations>
+  xmlns:lrml="http://docs.oasis-open.org/legalruleml/ns/v1.0/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ruleml="http://ruleml.org/spec">
 
   <lrml:Statements>
 
-    <!-- ============================================================ -->
-    <!-- R1: Zagađenje životne sredine - osnovni oblik (čl. 260 st. 1) -->
-    <!--                                                              -->
-    <!-- AKO osoba krši propise o zaštiti životne sredine             -->
-    <!--    I zagadila je vazduh/vodu/zemljište                       -->
-    <!--    I zagadjenje je veće mere ILI na širem prostoru           -->
-    <!--    I sa umišljajem                                           -->
-    <!-- ONDA krši čl. 260 st. 1                                      -->
-    <!--   raspon kazne: 6m - 60m (6 meseci do 5 godina)              -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R1">
-      <ruleml:Rule>
+    <!-- ===================== PRAVILA (cl. 260-268) ===================== -->
+
+    <!-- cl. 260 st. 1 — Zagadjenje, osnovni oblik (umisljaj) -->
+    <lrml:PrescriptiveStatement key="ps_260_1_1">
+      <ruleml:Rule key=":rule_260_1_1" closure="universal" strength="defeasible">
         <ruleml:if>
           <ruleml:And>
             <ruleml:Atom>
-              <ruleml:Rel>violatedEnvironmentalRegs</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
             </ruleml:Atom>
             <ruleml:Atom>
-              <ruleml:Rel>pollutionTarget</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Var>target</ruleml:Var>
+              <ruleml:Rel iri="lc:pollutionExtent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VECA_MERA</ruleml:Data>
             </ruleml:Atom>
-            <ruleml:Or>
-              <ruleml:Atom>
-                <ruleml:Rel>pollutionExtent</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>VECA_MERA</ruleml:Ind>
-              </ruleml:Atom>
-              <ruleml:Atom>
-                <ruleml:Rel>pollutionScope</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>SIRI_PROSTOR</ruleml:Ind>
-              </ruleml:Atom>
-            </ruleml:Or>
             <ruleml:Atom>
-              <ruleml:Rel>intent</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>UMISLJAJ</ruleml:Ind>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">UMISLJAJ</ruleml:Data>
             </ruleml:Atom>
           </ruleml:And>
         </ruleml:if>
         <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_260__para_1</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>6</ruleml:Ind>
-              <ruleml:Ind>60</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:then>
-      </ruleml:Rule>
-    </lrml:PrescriptiveStatement>
-
-    <!-- ============================================================ -->
-    <!-- R2: Zagađenje iz nehata (čl. 260 st. 2)                      -->
-    <!--                                                              -->
-    <!-- Iste činjenice kao R1 ALI sa nehatom umesto umišljaja        -->
-    <!-- ONDA krši čl. 260 st. 2                                      -->
-    <!--   raspon kazne: novčana ili do 2 godine (do 24 meseca)       -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R2">
-      <ruleml:Rule>
-        <ruleml:if>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violatedEnvironmentalRegs</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>pollutionTarget</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Var>target</ruleml:Var>
-            </ruleml:Atom>
-            <ruleml:Or>
-              <ruleml:Atom>
-                <ruleml:Rel>pollutionExtent</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>VECA_MERA</ruleml:Ind>
-              </ruleml:Atom>
-              <ruleml:Atom>
-                <ruleml:Rel>pollutionScope</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>SIRI_PROSTOR</ruleml:Ind>
-              </ruleml:Atom>
-            </ruleml:Or>
-            <ruleml:Atom>
-              <ruleml:Rel>intent</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>NEHAT</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_260__para_2</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>0</ruleml:Ind>
-              <ruleml:Ind>24</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:then>
-      </ruleml:Rule>
-    </lrml:PrescriptiveStatement>
-
-    <!-- ============================================================ -->
-    <!-- R3: Kvalifikovani oblik zagađenja sa umišljajem (čl. 260 st. 3) -->
-    <!--                                                              -->
-    <!-- AKO važi R1 (čl. 260 st. 1)                                  -->
-    <!--    I uništenje životinjskog/biljnog sveta velikih razmera    -->
-    <!--      ILI otklanjanje zahteva duže vreme/velike troškove      -->
-    <!-- ONDA krši čl. 260 st. 3                                      -->
-    <!--   raspon kazne: 12m - 96m (1 do 8 godina)                    -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R3">
-      <ruleml:Rule>
-        <ruleml:if>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_260__para_1</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Or>
-              <ruleml:Atom>
-                <ruleml:Rel>ecologicalDamage</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>VELIKIH_RAZMERA</ruleml:Ind>
-              </ruleml:Atom>
-              <ruleml:Atom>
-                <ruleml:Rel>damageRemovalDifficulty</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>ZAHTEVNO</ruleml:Ind>
-              </ruleml:Atom>
-            </ruleml:Or>
-          </ruleml:And>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_260__para_3</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>12</ruleml:Ind>
-              <ruleml:Ind>96</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:then>
-      </ruleml:Rule>
-    </lrml:PrescriptiveStatement>
-
-    <!-- ============================================================ -->
-    <!-- R4: Kvalifikovani oblik zagađenja iz nehata (čl. 260 st. 4)  -->
-    <!--                                                              -->
-    <!-- AKO važi R2 (čl. 260 st. 2)                                  -->
-    <!--    I uništenje životinjskog/biljnog sveta velikih razmera    -->
-    <!--      ILI otklanjanje zahteva duže vreme/velike troškove      -->
-    <!-- ONDA krši čl. 260 st. 4                                      -->
-    <!--   raspon kazne: 6m - 60m (6 meseci do 5 godina)              -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R4">
-      <ruleml:Rule>
-        <ruleml:if>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_260__para_2</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Or>
-              <ruleml:Atom>
-                <ruleml:Rel>ecologicalDamage</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>VELIKIH_RAZMERA</ruleml:Ind>
-              </ruleml:Atom>
-              <ruleml:Atom>
-                <ruleml:Rel>damageRemovalDifficulty</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>ZAHTEVNO</ruleml:Ind>
-              </ruleml:Atom>
-            </ruleml:Or>
-          </ruleml:And>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_260__para_4</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>6</ruleml:Ind>
-              <ruleml:Ind>60</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:then>
-      </ruleml:Rule>
-    </lrml:PrescriptiveStatement>
-
-    <!-- ============================================================ -->
-    <!-- R5: Nepreduzimanje mera zaštite (čl. 261 st. 1)              -->
-    <!--                                                              -->
-    <!-- AKO je učinilac službeno/odgovorno lice                      -->
-    <!--    I nije preduzeo propisane mere zaštite                    -->
-    <!-- ONDA krši čl. 261 st. 1                                      -->
-    <!--   raspon kazne: novčana ili do 3 godine (do 36 meseci)       -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R5">
-      <ruleml:Rule>
-        <ruleml:if>
-          <ruleml:And>
-            <ruleml:Or>
-              <ruleml:Atom>
-                <ruleml:Rel>perpetratorType</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>SLUZBENO_LICE</ruleml:Ind>
-              </ruleml:Atom>
-              <ruleml:Atom>
-                <ruleml:Rel>perpetratorType</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>ODGOVORNO_LICE</ruleml:Ind>
-              </ruleml:Atom>
-            </ruleml:Or>
-            <ruleml:Atom>
-              <ruleml:Rel>failedToTakeProtectiveMeasures</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_261__para_1</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>0</ruleml:Ind>
-              <ruleml:Ind>36</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:then>
-      </ruleml:Rule>
-    </lrml:PrescriptiveStatement>
-
-    <!-- ============================================================ -->
-    <!-- R6: Protivpravna izgradnja zagađujućih objekata (čl. 262 st. 1) -->
-    <!--                                                              -->
-    <!-- AKO je učinilac službeno/odgovorno lice                      -->
-    <!--    I dozvolio izgradnju/pogon objekata koji zagadjuju        -->
-    <!--    I zagadjenje je veće mere ILI na širem prostoru           -->
-    <!-- ONDA krši čl. 262 st. 1                                      -->
-    <!--   raspon kazne: 6m - 60m (6 meseci do 5 godina)              -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R6">
-      <ruleml:Rule>
-        <ruleml:if>
-          <ruleml:And>
-            <ruleml:Or>
-              <ruleml:Atom>
-                <ruleml:Rel>perpetratorType</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>SLUZBENO_LICE</ruleml:Ind>
-              </ruleml:Atom>
-              <ruleml:Atom>
-                <ruleml:Rel>perpetratorType</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>ODGOVORNO_LICE</ruleml:Ind>
-              </ruleml:Atom>
-            </ruleml:Or>
-            <ruleml:Atom>
-              <ruleml:Rel>unauthorizedConstruction</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-            </ruleml:Atom>
-            <ruleml:Or>
-              <ruleml:Atom>
-                <ruleml:Rel>pollutionExtent</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>VECA_MERA</ruleml:Ind>
-              </ruleml:Atom>
-              <ruleml:Atom>
-                <ruleml:Rel>pollutionScope</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-                <ruleml:Ind>SIRI_PROSTOR</ruleml:Ind>
-              </ruleml:Atom>
-            </ruleml:Or>
-          </ruleml:And>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_262__para_1</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>6</ruleml:Ind>
-              <ruleml:Ind>60</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:then>
-      </ruleml:Rule>
-    </lrml:PrescriptiveStatement>
-
-    <!-- ============================================================ -->
-    <!-- R7: Oštećenje objekata zaštite (čl. 263 st. 1)               -->
-    <!--                                                              -->
-    <!-- AKO je oštetio/uništio objekte za zaštitu životne sredine    -->
-    <!-- ONDA krši čl. 263 st. 1                                      -->
-    <!--   raspon kazne: 0 - 36m (do 3 godine)                        -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R7">
-      <ruleml:Rule>
-        <ruleml:if>
           <ruleml:Atom>
-            <ruleml:Rel>damagedProtectionEquipment</ruleml:Rel>
-            <ruleml:Var>person</ruleml:Var>
+            <ruleml:Rel>violates_260_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
           </ruleml:Atom>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_263__para_1</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>0</ruleml:Ind>
-              <ruleml:Ind>36</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
         </ruleml:then>
       </ruleml:Rule>
     </lrml:PrescriptiveStatement>
 
-    <!-- ============================================================ -->
-    <!-- R8: Uništenje zaštićenog prirodnog dobra (čl. 265 st. 1)     -->
-    <!--                                                              -->
-    <!-- AKO je uništio/oštetio posebno zaštićeno prirodno dobro      -->
-    <!-- ONDA krši čl. 265 st. 1                                      -->
-    <!--   raspon kazne: 6m - 60m (6 meseci do 5 godina)              -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R8">
-      <ruleml:Rule>
+    <!-- cl. 260 st. 1 — Zagadjenje, osnovni oblik (umisljaj) (varijanta 2) -->
+    <lrml:PrescriptiveStatement key="ps_260_1_2">
+      <ruleml:Rule key=":rule_260_1_2" closure="universal" strength="defeasible">
         <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionScope"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SIRI_PROSTOR</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">UMISLJAJ</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
           <ruleml:Atom>
-            <ruleml:Rel>destroyedProtectedNaturalAsset</ruleml:Rel>
-            <ruleml:Var>person</ruleml:Var>
+            <ruleml:Rel>violates_260_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
           </ruleml:Atom>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_265__para_1</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>6</ruleml:Ind>
-              <ruleml:Ind>60</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
         </ruleml:then>
       </ruleml:Rule>
     </lrml:PrescriptiveStatement>
 
-    <!-- ============================================================ -->
-    <!-- R9: Protivpravno iznošenje zaštićene vrste (čl. 265 st. 3)   -->
-    <!--                                                              -->
-    <!-- AKO je protivpravno iznosio/unosio zaštićenu vrstu           -->
-    <!-- ONDA krši čl. 265 st. 3                                      -->
-    <!--   raspon kazne: 3m - 36m (3 meseca do 3 godine)              -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R9">
-      <ruleml:Rule>
+    <!-- cl. 260 st. 2 — Zagadjenje iz nehata -->
+    <lrml:PrescriptiveStatement key="ps_260_2_1">
+      <ruleml:Rule key=":rule_260_2_1" closure="universal" strength="defeasible">
         <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionExtent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VECA_MERA</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">NEHAT</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
           <ruleml:Atom>
-            <ruleml:Rel>illegalSpeciesTraffic</ruleml:Rel>
-            <ruleml:Var>person</ruleml:Var>
+            <ruleml:Rel>violates_260_2</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
           </ruleml:Atom>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_265__para_3</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>3</ruleml:Ind>
-              <ruleml:Ind>36</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
         </ruleml:then>
       </ruleml:Rule>
     </lrml:PrescriptiveStatement>
 
-    <!-- ============================================================ -->
-    <!-- R10: Opasne materije - osnovni oblik (čl. 266 st. 1)         -->
-    <!--                                                              -->
-    <!-- AKO je radio sa opasnim materijama protivno propisima        -->
-    <!--    I nije zloupotreba službenog položaja                     -->
-    <!-- ONDA krši čl. 266 st. 1                                      -->
-    <!--   raspon kazne: 6m - 60m (6 meseci do 5 godina)              -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R10">
-      <ruleml:Rule>
+    <!-- cl. 260 st. 2 — Zagadjenje iz nehata (varijanta 2) -->
+    <lrml:PrescriptiveStatement key="ps_260_2_2">
+      <ruleml:Rule key=":rule_260_2_2" closure="universal" strength="defeasible">
         <ruleml:if>
           <ruleml:And>
             <ruleml:Atom>
-              <ruleml:Rel>dangerousSubstanceAction</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-            </ruleml:Atom>
-            <ruleml:Naf>
-              <ruleml:Atom>
-                <ruleml:Rel>officialPositionAbuse</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-              </ruleml:Atom>
-            </ruleml:Naf>
-            <ruleml:Naf>
-              <ruleml:Atom>
-                <ruleml:Rel>organizesCrime</ruleml:Rel>
-                <ruleml:Var>person</ruleml:Var>
-              </ruleml:Atom>
-            </ruleml:Naf>
-          </ruleml:And>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_266__para_1</ruleml:Ind>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
             </ruleml:Atom>
             <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>6</ruleml:Ind>
-              <ruleml:Ind>60</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:then>
-      </ruleml:Rule>
-    </lrml:PrescriptiveStatement>
-
-    <!-- ============================================================ -->
-    <!-- R11: Opasne materije - zloupotreba služ. položaja (čl. 266 st. 2) -->
-    <!--                                                              -->
-    <!-- AKO je radio sa opasnim materijama                           -->
-    <!--    I zloupotrebio službeni položaj                           -->
-    <!-- ONDA krši čl. 266 st. 2                                      -->
-    <!--   raspon kazne: 12m - 96m (1 do 8 godina)                    -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R11">
-      <ruleml:Rule>
-        <ruleml:if>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>dangerousSubstanceAction</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
+              <ruleml:Rel iri="lc:pollutionScope"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SIRI_PROSTOR</ruleml:Data>
             </ruleml:Atom>
             <ruleml:Atom>
-              <ruleml:Rel>officialPositionAbuse</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">NEHAT</ruleml:Data>
             </ruleml:Atom>
           </ruleml:And>
         </ruleml:if>
         <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_266__para_2</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>12</ruleml:Ind>
-              <ruleml:Ind>96</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:then>
-      </ruleml:Rule>
-    </lrml:PrescriptiveStatement>
-
-    <!-- ============================================================ -->
-    <!-- R12: Opasne materije - organizovanje vršenja (čl. 266 st. 5) -->
-    <!--                                                              -->
-    <!-- AKO je organizovao vršenje dela sa opasnim materijama        -->
-    <!-- ONDA krši čl. 266 st. 5                                      -->
-    <!--   raspon kazne: 36m - 120m (3 do 10 godina)                  -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R12">
-      <ruleml:Rule>
-        <ruleml:if>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>dangerousSubstanceAction</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>organizesCrime</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_266__para_5</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>36</ruleml:Ind>
-              <ruleml:Ind>120</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
-        </ruleml:then>
-      </ruleml:Rule>
-    </lrml:PrescriptiveStatement>
-
-    <!-- ============================================================ -->
-    <!-- R13: Nedozvoljena izgradnja nuklearnih postrojenja (čl. 267) -->
-    <!--                                                              -->
-    <!-- AKO je odobrio/pristupio izgradnji nuklearnog postrojenja    -->
-    <!-- ONDA krši čl. 267                                            -->
-    <!--   raspon kazne: 6m - 60m (6 meseci do 5 godina)              -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R13">
-      <ruleml:Rule>
-        <ruleml:if>
           <ruleml:Atom>
-            <ruleml:Rel>unauthorizedNuclearFacility</ruleml:Rel>
-            <ruleml:Var>person</ruleml:Var>
+            <ruleml:Rel>violates_260_2</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
           </ruleml:Atom>
-        </ruleml:if>
-        <ruleml:then>
-          <ruleml:And>
-            <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_267__para_1</ruleml:Ind>
-            </ruleml:Atom>
-            <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>6</ruleml:Ind>
-              <ruleml:Ind>60</ruleml:Ind>
-            </ruleml:Atom>
-          </ruleml:And>
         </ruleml:then>
       </ruleml:Rule>
     </lrml:PrescriptiveStatement>
 
-    <!-- ============================================================ -->
-    <!-- R14: Uskraćivanje informacija o životnoj sredini (čl. 268)   -->
-    <!--                                                              -->
-    <!-- AKO je uskratio/dao neistinite podatke o stanju živ. sredine -->
-    <!-- ONDA krši čl. 268                                            -->
-    <!--   raspon kazne: 0 - 12m (novčana ili do 1 godine)            -->
-    <!-- ============================================================ -->
-    <lrml:PrescriptiveStatement key="rule_R14">
-      <ruleml:Rule>
+    <!-- cl. 260 st. 3 — Kvalifikovani oblik (umisljaj + steta velikih razmera) -->
+    <lrml:PrescriptiveStatement key="ps_260_3_1">
+      <ruleml:Rule key=":rule_260_3_1" closure="universal" strength="defeasible">
         <ruleml:if>
-          <ruleml:Atom>
-            <ruleml:Rel>deniedEnvironmentalInfo</ruleml:Rel>
-            <ruleml:Var>person</ruleml:Var>
-          </ruleml:Atom>
-        </ruleml:if>
-        <ruleml:then>
           <ruleml:And>
             <ruleml:Atom>
-              <ruleml:Rel>violates</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>art_268__para_1</ruleml:Ind>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
             </ruleml:Atom>
             <ruleml:Atom>
-              <ruleml:Rel>sentenceRange</ruleml:Rel>
-              <ruleml:Var>person</ruleml:Var>
-              <ruleml:Ind>0</ruleml:Ind>
-              <ruleml:Ind>12</ruleml:Ind>
+              <ruleml:Rel iri="lc:pollutionExtent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VECA_MERA</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">UMISLJAJ</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:ecologicalDamage"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VELIKIH_RAZMERA</ruleml:Data>
             </ruleml:Atom>
           </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_260_3</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
         </ruleml:then>
       </ruleml:Rule>
     </lrml:PrescriptiveStatement>
+
+    <!-- cl. 260 st. 3 — Kvalifikovani oblik (umisljaj + steta velikih razmera) (varijanta 2) -->
+    <lrml:PrescriptiveStatement key="ps_260_3_2">
+      <ruleml:Rule key=":rule_260_3_2" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionExtent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VECA_MERA</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">UMISLJAJ</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:damageRemovalDifficulty"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">ZAHTEVNO</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_260_3</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 260 st. 3 — Kvalifikovani oblik (umisljaj + steta velikih razmera) (varijanta 3) -->
+    <lrml:PrescriptiveStatement key="ps_260_3_3">
+      <ruleml:Rule key=":rule_260_3_3" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionScope"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SIRI_PROSTOR</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">UMISLJAJ</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:ecologicalDamage"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VELIKIH_RAZMERA</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_260_3</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 260 st. 3 — Kvalifikovani oblik (umisljaj + steta velikih razmera) (varijanta 4) -->
+    <lrml:PrescriptiveStatement key="ps_260_3_4">
+      <ruleml:Rule key=":rule_260_3_4" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionScope"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SIRI_PROSTOR</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">UMISLJAJ</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:damageRemovalDifficulty"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">ZAHTEVNO</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_260_3</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 260 st. 4 — Kvalifikovani oblik (nehat + steta velikih razmera) -->
+    <lrml:PrescriptiveStatement key="ps_260_4_1">
+      <ruleml:Rule key=":rule_260_4_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionExtent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VECA_MERA</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">NEHAT</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:ecologicalDamage"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VELIKIH_RAZMERA</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_260_4</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 260 st. 4 — Kvalifikovani oblik (nehat + steta velikih razmera) (varijanta 2) -->
+    <lrml:PrescriptiveStatement key="ps_260_4_2">
+      <ruleml:Rule key=":rule_260_4_2" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionExtent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VECA_MERA</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">NEHAT</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:damageRemovalDifficulty"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">ZAHTEVNO</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_260_4</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 260 st. 4 — Kvalifikovani oblik (nehat + steta velikih razmera) (varijanta 3) -->
+    <lrml:PrescriptiveStatement key="ps_260_4_3">
+      <ruleml:Rule key=":rule_260_4_3" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionScope"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SIRI_PROSTOR</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">NEHAT</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:ecologicalDamage"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VELIKIH_RAZMERA</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_260_4</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 260 st. 4 — Kvalifikovani oblik (nehat + steta velikih razmera) (varijanta 4) -->
+    <lrml:PrescriptiveStatement key="ps_260_4_4">
+      <ruleml:Rule key=":rule_260_4_4" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:violatedEnvironmentalRegs"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionScope"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SIRI_PROSTOR</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:intent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">NEHAT</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:damageRemovalDifficulty"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">ZAHTEVNO</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_260_4</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 261 st. 1 — Nepreduzimanje mera zastite -->
+    <lrml:PrescriptiveStatement key="ps_261_1_1">
+      <ruleml:Rule key=":rule_261_1_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:perpetratorType"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SLUZBENO_LICE</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:failedToTakeProtectiveMeasures"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_261_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 261 st. 1 — Nepreduzimanje mera zastite (varijanta 2) -->
+    <lrml:PrescriptiveStatement key="ps_261_1_2">
+      <ruleml:Rule key=":rule_261_1_2" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:perpetratorType"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">ODGOVORNO_LICE</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:failedToTakeProtectiveMeasures"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_261_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 262 st. 1 — Protivpravna izgradnja zagadjujucih objekata -->
+    <lrml:PrescriptiveStatement key="ps_262_1_1">
+      <ruleml:Rule key=":rule_262_1_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:perpetratorType"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SLUZBENO_LICE</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:unauthorizedConstruction"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionExtent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VECA_MERA</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_262_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 262 st. 1 — Protivpravna izgradnja zagadjujucih objekata (varijanta 2) -->
+    <lrml:PrescriptiveStatement key="ps_262_1_2">
+      <ruleml:Rule key=":rule_262_1_2" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:perpetratorType"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SLUZBENO_LICE</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:unauthorizedConstruction"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionScope"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SIRI_PROSTOR</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_262_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 262 st. 1 — Protivpravna izgradnja zagadjujucih objekata (varijanta 3) -->
+    <lrml:PrescriptiveStatement key="ps_262_1_3">
+      <ruleml:Rule key=":rule_262_1_3" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:perpetratorType"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">ODGOVORNO_LICE</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:unauthorizedConstruction"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionExtent"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">VECA_MERA</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_262_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 262 st. 1 — Protivpravna izgradnja zagadjujucih objekata (varijanta 4) -->
+    <lrml:PrescriptiveStatement key="ps_262_1_4">
+      <ruleml:Rule key=":rule_262_1_4" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:perpetratorType"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">ODGOVORNO_LICE</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:unauthorizedConstruction"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:pollutionScope"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">SIRI_PROSTOR</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_262_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 263 st. 1 — Ostecenje objekata za zastitu zivotne sredine -->
+    <lrml:PrescriptiveStatement key="ps_263_1_1">
+      <ruleml:Rule key=":rule_263_1_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:damagedProtectionEquipment"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_263_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 265 st. 1 — Unistenje posebno zasticenog prirodnog dobra -->
+    <lrml:PrescriptiveStatement key="ps_265_1_1">
+      <ruleml:Rule key=":rule_265_1_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:destroyedProtectedNaturalAsset"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_265_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 265 st. 3 — Protivpravno iznosenje zasticene vrste -->
+    <lrml:PrescriptiveStatement key="ps_265_3_1">
+      <ruleml:Rule key=":rule_265_3_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:illegalSpeciesTraffic"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_265_3</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 266 st. 1 — Opasne materije, osnovni oblik -->
+    <lrml:PrescriptiveStatement key="ps_266_1_1">
+      <ruleml:Rule key=":rule_266_1_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:dangerousSubstanceAction"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_266_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 266 st. 2 — Opasne materije + zloupotreba sluzbenog polozaja -->
+    <lrml:PrescriptiveStatement key="ps_266_2_1">
+      <ruleml:Rule key=":rule_266_2_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:dangerousSubstanceAction"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:officialPositionAbuse"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_266_2</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 266 st. 5 — Organizovanje vrsenja dela sa opasnim materijama -->
+    <lrml:PrescriptiveStatement key="ps_266_5_1">
+      <ruleml:Rule key=":rule_266_5_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:dangerousSubstanceAction"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:organizesCrime"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_266_5</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 267 — Nedozvoljena izgradnja nuklearnog postrojenja -->
+    <lrml:PrescriptiveStatement key="ps_267_1_1">
+      <ruleml:Rule key=":rule_267_1_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:unauthorizedNuclearFacility"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_267_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- cl. 268 — Uskracivanje podataka o stanju zivotne sredine -->
+    <lrml:PrescriptiveStatement key="ps_268_1_1">
+      <ruleml:Rule key=":rule_268_1_1" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel iri="lc:deniedEnvironmentalInfo"/>
+              <ruleml:Var type="lc:defendant">Defendant</ruleml:Var>
+              <ruleml:Data xsi:type="xs:string">true</ruleml:Data>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Atom>
+            <ruleml:Rel>violates_268_1</ruleml:Rel>
+            <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+          </ruleml:Atom>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- ===================== NEGACIJE / POBIJANJA ===================== -->
+
+    <!-- pobijanje: ako violates_260_3 onda NE violates_260_1 -->
+    <lrml:PrescriptiveStatement key="ps_n_r3">
+      <ruleml:Rule key=":rule_n_r3" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_260_3</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Negation>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_260_1</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:Negation>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- pobijanje: ako violates_260_4 onda NE violates_260_2 -->
+    <lrml:PrescriptiveStatement key="ps_n_r4">
+      <ruleml:Rule key=":rule_n_r4" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_260_4</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Negation>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_260_2</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:Negation>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- pobijanje: ako violates_266_2 onda NE violates_266_1 -->
+    <lrml:PrescriptiveStatement key="ps_n_r11">
+      <ruleml:Rule key=":rule_n_r11" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_266_2</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Negation>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_266_1</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:Negation>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- pobijanje: ako violates_266_5 onda NE violates_266_1 -->
+    <lrml:PrescriptiveStatement key="ps_n_r12a">
+      <ruleml:Rule key=":rule_n_r12a" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_266_5</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Negation>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_266_1</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:Negation>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- pobijanje: ako violates_266_5 onda NE violates_266_2 -->
+    <lrml:PrescriptiveStatement key="ps_n_r12b">
+      <ruleml:Rule key=":rule_n_r12b" closure="universal" strength="defeasible">
+        <ruleml:if>
+          <ruleml:And>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_266_5</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:And>
+        </ruleml:if>
+        <ruleml:then>
+          <ruleml:Negation>
+            <ruleml:Atom>
+              <ruleml:Rel>violates_266_2</ruleml:Rel>
+              <ruleml:Var type=":defendant">Defendant</ruleml:Var>
+            </ruleml:Atom>
+          </ruleml:Negation>
+        </ruleml:then>
+      </ruleml:Rule>
+    </lrml:PrescriptiveStatement>
+
+    <!-- ===================== KAZNE (raspon u mesecima) ===================== -->
+
+    <lrml:PenaltyStatement key="pen_violates_260_1_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>6</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_260_1_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>60</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_260_2_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>24</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_260_3_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>12</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_260_3_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>96</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_260_4_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>6</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_260_4_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>60</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_261_1_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>36</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_262_1_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>6</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_262_1_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>60</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_263_1_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>36</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_265_1_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>6</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_265_1_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>60</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_265_3_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>3</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_265_3_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>36</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_266_1_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>6</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_266_1_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>60</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_266_2_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>12</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_266_2_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>96</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_266_5_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>36</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_266_5_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>120</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_267_1_min">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":min_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>6</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_267_1_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>60</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+    <lrml:PenaltyStatement key="pen_violates_268_1_max">
+      <lrml:SuborderList>
+        <lrml:Obligation>
+          <ruleml:Atom>
+            <ruleml:Rel iri=":max_imprisonment"/>
+            <ruleml:Var>Months</ruleml:Var>
+            <ruleml:Ind>12</ruleml:Ind>
+          </ruleml:Atom>
+        </lrml:Obligation>
+      </lrml:SuborderList>
+    </lrml:PenaltyStatement>
+
+    <!-- ============== OVERRIDE (kvalifikovani / tezi oblik pobija blazi) ============== -->
+
+    <lrml:OverrideStatement><lrml:Override under="#ps_260_1_1" over="#ps_n_r3"/></lrml:OverrideStatement>
+    <lrml:OverrideStatement><lrml:Override under="#ps_260_1_2" over="#ps_n_r3"/></lrml:OverrideStatement>
+    <lrml:OverrideStatement><lrml:Override under="#ps_260_2_1" over="#ps_n_r4"/></lrml:OverrideStatement>
+    <lrml:OverrideStatement><lrml:Override under="#ps_260_2_2" over="#ps_n_r4"/></lrml:OverrideStatement>
+    <lrml:OverrideStatement><lrml:Override under="#ps_266_1_1" over="#ps_n_r11"/></lrml:OverrideStatement>
+    <lrml:OverrideStatement><lrml:Override under="#ps_266_1_1" over="#ps_n_r12a"/></lrml:OverrideStatement>
+    <lrml:OverrideStatement><lrml:Override under="#ps_266_2_1" over="#ps_n_r12b"/></lrml:OverrideStatement>
+
+    <!-- ===================== REPARACIJE (pravilo -> kazna) ===================== -->
+
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_260_1_min"/><lrml:toPrescriptiveStatement keyref="#ps_260_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_260_1_max"/><lrml:toPrescriptiveStatement keyref="#ps_260_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_260_2_max"/><lrml:toPrescriptiveStatement keyref="#ps_260_2_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_260_3_min"/><lrml:toPrescriptiveStatement keyref="#ps_260_3_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_260_3_max"/><lrml:toPrescriptiveStatement keyref="#ps_260_3_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_260_4_min"/><lrml:toPrescriptiveStatement keyref="#ps_260_4_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_260_4_max"/><lrml:toPrescriptiveStatement keyref="#ps_260_4_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_261_1_max"/><lrml:toPrescriptiveStatement keyref="#ps_261_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_262_1_min"/><lrml:toPrescriptiveStatement keyref="#ps_262_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_262_1_max"/><lrml:toPrescriptiveStatement keyref="#ps_262_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_263_1_max"/><lrml:toPrescriptiveStatement keyref="#ps_263_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_265_1_min"/><lrml:toPrescriptiveStatement keyref="#ps_265_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_265_1_max"/><lrml:toPrescriptiveStatement keyref="#ps_265_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_265_3_min"/><lrml:toPrescriptiveStatement keyref="#ps_265_3_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_265_3_max"/><lrml:toPrescriptiveStatement keyref="#ps_265_3_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_266_1_min"/><lrml:toPrescriptiveStatement keyref="#ps_266_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_266_1_max"/><lrml:toPrescriptiveStatement keyref="#ps_266_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_266_2_min"/><lrml:toPrescriptiveStatement keyref="#ps_266_2_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_266_2_max"/><lrml:toPrescriptiveStatement keyref="#ps_266_2_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_266_5_min"/><lrml:toPrescriptiveStatement keyref="#ps_266_5_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_266_5_max"/><lrml:toPrescriptiveStatement keyref="#ps_266_5_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_267_1_min"/><lrml:toPrescriptiveStatement keyref="#ps_267_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_267_1_max"/><lrml:toPrescriptiveStatement keyref="#ps_267_1_1"/></lrml:Reparation></lrml:ReparationStatement>
+    <lrml:ReparationStatement><lrml:Reparation><lrml:appliesPenalty keyref="#pen_violates_268_1_max"/><lrml:toPrescriptiveStatement keyref="#ps_268_1_1"/></lrml:Reparation></lrml:ReparationStatement>
 
   </lrml:Statements>
 </lrml:LegalRuleML>

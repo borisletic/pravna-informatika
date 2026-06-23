@@ -47,6 +47,12 @@ app:
     rules-file: ${app.data-dir}/rules/environmental_rules.lrml
     cases-file: ${app.data-dir}/cases/cases.csv
     predicate-dict: ${app.data-dir}/schemas/predicate_dictionary.yaml
+  # Celina 5 — rasudjivanje po pravilima alatom dr-device (CLIPS defeasible reasoner).
+  # home: putanja do dr-device distribucije (default je ../dr-device u odnosu na app/).
+  dr-device:
+    enabled: ${DR_DEVICE_ENABLED:true}
+    home: ${DR_DEVICE_HOME:./dr-device}
+    timeout-seconds: 90
 
 logging:
   level:

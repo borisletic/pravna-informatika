@@ -11,7 +11,7 @@ import rs.ftn.pi.nlp.NlpClient;
 import rs.ftn.pi.nlp.NlpDtos;
 import rs.ftn.pi.reasoning.cbr.CaseReasoner;
 import rs.ftn.pi.reasoning.dto.ReasoningResult;
-import rs.ftn.pi.reasoning.rule.RuleReasoner;
+import rs.ftn.pi.reasoning.rule.DrDeviceReasoner;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReasoningService {
 
-    private final RuleReasoner ruleReasoner;
+    private final DrDeviceReasoner ruleReasoner;
     private final CaseReasoner caseReasoner;
     private final NlpClient nlpClient;
     /**

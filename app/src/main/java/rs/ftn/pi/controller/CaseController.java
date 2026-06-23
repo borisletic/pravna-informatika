@@ -36,7 +36,7 @@ public class CaseController {
     /**
      * NLP alias -> kanonske vrednosti.
      * NLP (Član 2) vraća svoje vrednosti, pravila (Član 1) koriste kanonske.
-     * Mapiranje se radi ovde, pre nego što činjenice udju u Drools.
+     * Mapiranje se radi ovde, pre nego što činjenice udju u reasoner (dr-device).
      *
      * Sinkronizovano sa predicate_dictionary.yaml v0.3.0, sekcija nlp_aliases.
      */
